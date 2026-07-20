@@ -39,4 +39,5 @@ Checkpoint는 해답을 모두 공개하는 벌점이 아니라, 정해진 시�
 - 예상한 theorem과 proof state에서 시작한다.
 - 숨긴 proof를 재정의하거나 module name이 충돌하지 않는다.
 - Reference solution과 같은 source/target 방향 및 definitions를 사용한다.
-- 새 prebuilt image에서 모든 checkpoint를 순서와 무관하게 열 수 있다.
+- README의 opam 설치 절차를 마친 새 환경에서 모든 checkpoint를 순서와 무관하게
+  열 수 있다.

@@ -1,6 +1,5 @@
 CRIS_DIR ?= ../CRIS-private
-COQBIN ?= ../.tools/codex-coq-bin
-COQC := $(COQBIN)/coqc
+COQC ?= coqc
 
 COQFLAGS := \
 	-q \
@@ -39,6 +38,11 @@ CHECKPOINT_SOURCES := \
 	checkpoints/Checkpoint40_AfterGet.v \
 	checkpoints/Checkpoint50_AfterPutRelation.v
 
+WORKSHOP_SOURCES := \
+	$(SOLUTION_SOURCES) \
+	$(EXERCISE_SOURCES) \
+	$(CHECKPOINT_SOURCES)
+
 .PHONY: all solutions exercises checkpoints check clean
 
 all: solutions exercises checkpoints
@@ -62,8 +66,8 @@ checkpoints: solutions
 	done
 
 check: all
-	@if rg -n --glob '*.v' '\b(Admitted|admit)\b' \
-		theories exercises checkpoints; then \
+	@if grep -nE '(^|[^[:alnum:]_])(Admitted|admit)([^[:alnum:]_]|$$)' \
+		$(WORKSHOP_SOURCES); then \
 		echo "Unexpected admitted proof in workshop Rocq files" >&2; \
 		exit 1; \
 	fi
