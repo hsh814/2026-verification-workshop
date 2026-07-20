@@ -1,0 +1,28 @@
+-arg -w -arg -deprecated-hint-without-locality
+-arg -w -arg -deprecated-instance-without-locality
+-arg -w -arg -notation-incompatible-prefix
+-arg -w -arg -notation-overriden
+-arg -w -arg -ambiguous-paths
+-arg -w -arg -redundant-canonical-projection
+-arg -w -arg -cannot-define-projection
+-arg -require-import -arg ExtLib.Structures.Monad
+-R ../CRIS-private/itreeS ITreeS
+-R ../CRIS-private/theories CRIS
+-R ../CRIS-private/library CRIS
+-Q theories Workshop
+-Q exercises WorkshopExercises
+-Q checkpoints WorkshopCheckpoints
+theories/SimulationCases.v
+theories/CompilerPairs.v
+theories/KVSource.v
+theories/SortedListTarget.v
+theories/KVSortedListProof.v
+exercises/Exercise00_RocqCheck.v
+exercises/Exercise10_SimulationCases_Start.v
+exercises/Exercise20_CompilerPairs_Start.v
+exercises/Exercise32_KVSortedList_Start.v
+checkpoints/Checkpoint10_AfterFirstSimulation.v
+checkpoints/Checkpoint20_AfterCompilerPairs.v
+checkpoints/Checkpoint30_SortedListRelation.v
+checkpoints/Checkpoint40_AfterGet.v
+checkpoints/Checkpoint50_AfterPutRelation.v
