@@ -6,14 +6,21 @@ Workshop materials for Rocq and CRIS.
 
 TBA. The lecture content is in development.
 
+The repository contains two Rocq exercise files:
+
+- `Optimizations.v` proves stateless constant folding and stateful
+  store-to-load forwarding.
+- `KVSortedList.v` proves that a sorted-list implementation refines an
+  abstract key-value store. Its `get` operation traverses the list one cell at
+  a time with `ITree.iter`.
+
 ## Requirements
 
 - `git`
 - `make`
-- Bash, `find`, `sed`, and standard build tools
+- standard Unix tools such as `find` and `grep`
 - [opam](https://opam.ocaml.org/doc/Install.html) 2.1 or newer
-- GitHub access to `snu-sf/CRIS-private` and
-  `snu-sf/2026-verification-workshop`
+- GitHub access to `snu-sf/2026-verification-workshop`
 - [an SSH key configured for GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 Linux and macOS can use the commands below directly. Windows users should run
@@ -36,64 +43,35 @@ Activate the switch again after opening a new terminal:
 eval "$(opam env --switch=cris-workshop --set-switch)"
 ```
 
-### 2. Install Rocq 9.0 and the CRIS dependencies
+### 2. Install CRIS at the workshop commit
 
 ```sh
 opam repo add rocq-released https://rocq-prover.org/opam/released
-opam install \
-  coq.9.0.0 \
-  coq-paco.4.2.3 \
-  coq-itree.5.2.1 \
-  coq-ext-lib.0.13.0 \
-  coq-ordinal.0.5.6 \
-  coq-stdpp.1.12.0 \
-  coq-iris.4.4.0
+opam pin add -y --jobs=2 rocq-cris \
+  'git+https://github.com/snu-sf/CRIS.git#41a85b96778ae12c060afd5891d1eb830afccbc3'
 ```
 
-The `coq.9.0.0` package provides Rocq 9.0 with the compatibility command names
-used by CRIS. Check the active version:
+This installs Rocq 9.0.0, the exact CRIS dependencies, and CRIS itself. Check
+the active installation:
 
 ```sh
+opam list --installed rocq-cris
+opam pin list | grep '^rocq-cris'
 coqc --version
 ```
 
-The output should contain `9.0.0`.
+The final command should report version `9.0.0`.
 
-### 3. Clone CRIS and the workshop
-
-Keep both repositories under the same parent directory:
-
-```text
-verification-workshop/
-├── CRIS-private/
-└── 2026-verification-workshop/
-```
+### 3. Clone the workshop
 
 ```sh
-mkdir verification-workshop
-cd verification-workshop
-
-git clone git@github.com:snu-sf/CRIS-private.git
-git -C CRIS-private checkout 56a62de13912f282b460e9b806c0fce045e0880c
-
 git clone git@github.com:snu-sf/2026-verification-workshop.git
-```
-
-The sibling layout matches the paths in `Makefile` and `_CoqProject`.
-
-### 4. Build CRIS
-
-```sh
-eval "$(opam env --switch=cris-workshop --set-switch)"
-make -C CRIS-private -j4
-```
-
-Use a smaller job count on a machine with limited memory.
-
-### 5. Check the workshop
-
-```sh
 cd 2026-verification-workshop
+```
+
+### 4. Check the workshop
+
+```sh
 make check
 ```
 
@@ -129,20 +107,34 @@ Use the current [Proof General](https://github.com/ProofGeneral/PG#installing-pr
 package. Install it through NonGNU ELPA or MELPA, then start Emacs from the
 active opam switch.
 
+### Unicode input
+
+CRIS source files use Unicode mathematical notation.
+
+- **VS Code:** install
+  [latex-input](https://marketplace.visualstudio.com/items?itemName=yellpika.latex-input),
+  type a LaTeX-style name such as `\Sigma`, and accept the completion to insert
+  `Σ`.
+- **Vim/Neovim:** in Insert mode, `Ctrl-V u03a3` inserts `Σ`. See
+  [Coqtail's Unicode input note](https://github.com/whonore/Coqtail#unicode-input)
+  for native key sequences and optional plugins.
+- **Emacs:** select the built-in `TeX` input method with
+  `M-x set-input-method RET TeX RET`, type `\Sigma`, and use `C-\` to toggle the
+  input method. See the GNU Emacs documentation on
+  [input methods](https://www.gnu.org/software/emacs/manual/html_node/emacs/Select-Input-Method.html)
+  and [`insert-char`](https://www.gnu.org/software/emacs/manual/html_node/emacs/Inserting-Text.html).
+
 ### Editor check
 
-Open [`exercises/Exercise00_RocqCheck.v`](exercises/Exercise00_RocqCheck.v) and
-process it from the first line to the end.
+Open [`Optimizations.v`](Optimizations.v) and process it from the first line to
+the end.
 
 ## Repository layout
 
 | Path | Purpose |
 |---|---|
-| `exercises/` | Student starter files |
-| `checkpoints/` | Intermediate starting points |
-| `theories/` | Reference definitions and proofs |
-| `lectures/` | TBA |
-| `handouts/` | TBA |
+| `Optimizations.v` | Stateless and stateful compiler-optimization refinements |
+| `KVSortedList.v` | Sorted-list implementation versus abstract key-value storage |
 
 ## Troubleshooting
 
@@ -154,10 +146,10 @@ command -v coqc
 coqc --version
 ```
 
-Rebuild CRIS and the workshop after a load-path or `.vo` error:
+Reinstall CRIS and rebuild the workshop after a load-path or `.vo` error:
 
 ```sh
-make -C ../CRIS-private -j4
+opam reinstall --jobs=2 rocq-cris
 make clean
 make check
 ```
@@ -175,6 +167,7 @@ cover editor-specific problems.
 - [Software Foundations](https://softwarefoundations.cis.upenn.edu/lf-current/index.html)
 - [Interaction Trees project](https://deepspec.github.io/InteractionTrees/)
 - [Interaction Trees paper](https://doi.org/10.1145/3371119)
+- [Refinement Tutorial](https://github.com/dongjaelee1/refinement-tutorial)
 - [Iris 4.4.0 Proof Mode documentation](https://gitlab.mpi-sws.org/iris/iris/-/blob/iris-4.4.0/docs/proof_mode.md)
 - [Iris Proof Mode paper](https://iris-project.org/pdfs/2017-popl-proofmode-final.pdf)
 - [Iris lecture notes](https://iris-project.org/tutorial-material.html)
