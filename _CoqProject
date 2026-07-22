@@ -6,5 +6,6 @@
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -cannot-define-projection
 -arg -require-import -arg ExtLib.Structures.Monad
+Behavior.v
 Optimizations.v
 KVSortedList.v

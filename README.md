@@ -6,8 +6,9 @@ Workshop materials for Rocq and CRIS.
 
 TBA. The lecture content is in development.
 
-The repository contains two Rocq exercise files:
+The repository contains one guided lecture file and two exercise files:
 
+- `Behavior.v` introduces behaviors with small executable examples.
 - `Optimizations.v` proves stateless constant folding and stateful
   store-to-load forwarding.
 - `KVSortedList.v` proves that a sorted-list implementation refines an
@@ -20,8 +21,6 @@ The repository contains two Rocq exercise files:
 - `make`
 - standard Unix tools such as `find` and `grep`
 - [opam](https://opam.ocaml.org/doc/Install.html) 2.1 or newer
-- GitHub access to `snu-sf/2026-verification-workshop`
-- [an SSH key configured for GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 
 Linux and macOS can use the commands below directly. Windows users should run
 the build inside WSL.
@@ -43,16 +42,16 @@ Activate the switch again after opening a new terminal:
 eval "$(opam env --switch=cris-workshop --set-switch)"
 ```
 
-### 2. Install CRIS at the workshop commit
+### 2. Install CRIS v2026-07-22
 
 ```sh
 opam repo add rocq-released https://rocq-prover.org/opam/released
 opam pin add -y --jobs=2 rocq-cris \
-  'git+https://github.com/snu-sf/CRIS.git#41a85b96778ae12c060afd5891d1eb830afccbc3'
+  'git+https://github.com/snu-sf/CRIS.git#v2026-07-22'
 ```
 
-This installs Rocq 9.0.0, the exact CRIS dependencies, and CRIS itself. Check
-the active installation:
+This installs the [CRIS v2026-07-22 release](https://github.com/snu-sf/CRIS/releases/tag/v2026-07-22),
+Rocq 9.0.0, and the exact CRIS dependencies. Check the active installation:
 
 ```sh
 opam list --installed rocq-cris
@@ -65,7 +64,7 @@ The final command should report version `9.0.0`.
 ### 3. Clone the workshop
 
 ```sh
-git clone git@github.com:snu-sf/2026-verification-workshop.git
+git clone https://github.com/snu-sf/2026-verification-workshop.git
 cd 2026-verification-workshop
 ```
 
@@ -126,13 +125,14 @@ CRIS source files use Unicode mathematical notation.
 
 ### Editor check
 
-Open [`Optimizations.v`](Optimizations.v) and process it from the first line to
+Open [`Behavior.v`](Behavior.v) and process it from the first line to
 the end.
 
 ## Repository layout
 
 | Path | Purpose |
 |---|---|
+| `Behavior.v` | Guided examples of terminating, nondeterministic, and I/O behaviors |
 | `Optimizations.v` | Stateless and stateful compiler-optimization refinements |
 | `KVSortedList.v` | Sorted-list implementation versus abstract key-value storage |
 
