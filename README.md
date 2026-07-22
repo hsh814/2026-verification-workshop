@@ -149,7 +149,7 @@ coqc --version
 Reinstall CRIS and rebuild the workshop after a load-path or `.vo` error:
 
 ```sh
-opam reinstall --jobs=2 rocq-cris
+opam reinstall --jobs=N rocq-cris
 make clean
 make check
 ```
