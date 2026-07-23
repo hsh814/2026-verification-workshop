@@ -48,7 +48,7 @@ eval "$(opam env --switch=cris-workshop --set-switch)"
 
 ```sh
 opam repo add rocq-released https://rocq-prover.org/opam/released
-opam pin add -y --jobs=2 rocq-cris \
+opam pin add -y --jobs=N rocq-cris \
   'git+https://github.com/snu-sf/CRIS.git#v2026-07-22'
 ```
 
@@ -152,7 +152,7 @@ coqc --version
 Reinstall CRIS and rebuild the workshop after a load-path or `.vo` error:
 
 ```sh
-opam reinstall --jobs=2 rocq-cris
+opam reinstall --jobs=N rocq-cris
 make clean
 make check
 ```

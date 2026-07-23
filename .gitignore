@@ -6,4 +6,7 @@
 *.vos
 .lia.cache
 .nia.cache
-/build/
+.prime-deps.mk
+
+.envrc
+.DS_Store
