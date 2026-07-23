@@ -6,3 +6,4 @@
 *.vos
 .lia.cache
 .nia.cache
+/build/

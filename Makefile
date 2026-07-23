@@ -11,7 +11,7 @@ COQFLAGS := \
 	-w -cannot-define-projection \
 	-require-import ExtLib.Structures.Monad
 
-SOURCES := Behavior.v Optimizations.v KVSortedList.v
+SOURCES := Behavior.v ModuleIntro.v Optimizations.v KVSortedList.v
 
 .PHONY: all check clean
 

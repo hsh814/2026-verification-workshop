@@ -7,5 +7,6 @@
 -arg -w -arg -cannot-define-projection
 -arg -require-import -arg ExtLib.Structures.Monad
 Behavior.v
+ModuleIntro.v
 Optimizations.v
 KVSortedList.v

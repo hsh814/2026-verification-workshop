@@ -6,9 +6,11 @@ Workshop materials for Rocq and CRIS.
 
 TBA. The lecture content is in development.
 
-The repository contains one guided lecture file and two exercise files:
+The repository contains two guided lecture files and two exercise files:
 
 - `Behavior.v` introduces behaviors with small executable examples.
+- `ModuleIntro.v` packages a function in a module, calls it from an entry
+  module, and links the modules into a closed program.
 - `Optimizations.v` proves stateless constant folding and stateful
   store-to-load forwarding.
 - `KVSortedList.v` proves that a sorted-list implementation refines an
@@ -133,6 +135,7 @@ the end.
 | Path | Purpose |
 |---|---|
 | `Behavior.v` | Guided examples of terminating, nondeterministic, and I/O behaviors |
+| `ModuleIntro.v` | Stateless modules, function calls, linking, and compilation |
 | `Optimizations.v` | Stateless and stateful compiler-optimization refinements |
 | `KVSortedList.v` | Sorted-list implementation versus abstract key-value storage |
 
