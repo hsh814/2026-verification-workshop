@@ -6,6 +6,9 @@
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -cannot-define-projection
 -arg -require-import -arg ExtLib.Structures.Monad
+-arg -exclude-dir -arg imp_system
+-Q prime-examples ""
+-Q prime-examples/imp_system CRIS.imp_system
 Behavior.v
 Optimizations.v
 KVSortedList.v

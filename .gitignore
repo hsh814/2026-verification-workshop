@@ -6,3 +6,7 @@
 *.vos
 .lia.cache
 .nia.cache
+.prime-deps.mk
+
+.envrc
+.DS_Store
