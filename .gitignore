@@ -7,6 +7,7 @@
 .lia.cache
 .nia.cache
 .prime-deps.mk
+.sl-deps.mk
 
 .envrc
 .DS_Store
