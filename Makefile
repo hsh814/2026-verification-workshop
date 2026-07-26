@@ -34,6 +34,8 @@ SL_LOADPATH := \
 SL_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
 	-type f -name '*.v' | sort)
 SL_OBJECTS := $(SL_SOURCES:.v=.vo)
+SL_ANSWER_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
+	-type f -path '*_answer/*.v' | sort)
 SL_DEPS := .sl-deps.mk
 SL_COQFLAGS := $(COQFLAGS) $(SL_LOADPATH)
 
@@ -45,13 +47,20 @@ ifneq ($(filter sl,$(MAKECMDGOALS)),)
 -include $(SL_DEPS)
 endif
 
-.PHONY: all prime sl check clean
+.PHONY: all prime sl check check-sl-answers clean
 
 all: $(OBJECTS)
 
 prime: $(PRIME_OBJECTS)
 
-sl: $(SL_OBJECTS)
+sl: $(SL_OBJECTS) check-sl-answers
+
+check-sl-answers:
+	@if grep -nE '(^|[^[:alnum:]_])(Admitted|admit)([^[:alnum:]_]|$$)' \
+		$(SL_ANSWER_SOURCES); then \
+		echo "Unexpected admitted proof in separation-logic answers" >&2; \
+		exit 1; \
+	fi
 
 $(OBJECTS): %.vo: %.v Makefile
 	@echo "COQC $<"
