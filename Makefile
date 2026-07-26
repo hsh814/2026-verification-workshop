@@ -28,14 +28,16 @@ PRIME_DEPS := .prime-deps.mk
 PRIME_COQFLAGS := $(COQFLAGS) $(PRIME_LOADPATH)
 
 SL_EXAMPLES_DIR := separation-logic-examples
-SL_LOADPATH := -Q $(SL_EXAMPLES_DIR) ''
+SL_LOADPATH := \
+	-Q $(SL_EXAMPLES_DIR) '' \
+	-Q $(IMP_SYSTEM_DIR) CRIS.imp_system
 SL_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
 	-type f -name '*.v' | sort)
 SL_OBJECTS := $(SL_SOURCES:.v=.vo)
 SL_DEPS := .sl-deps.mk
 SL_COQFLAGS := $(COQFLAGS) $(SL_LOADPATH)
 
-ifneq ($(filter prime,$(MAKECMDGOALS)),)
+ifneq ($(filter prime sl,$(MAKECMDGOALS)),)
 -include $(PRIME_DEPS)
 endif
 

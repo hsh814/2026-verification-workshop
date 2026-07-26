@@ -9,6 +9,7 @@
 -arg -exclude-dir -arg imp_system
 -Q prime-examples ""
 -Q prime-examples/imp_system CRIS.imp_system
+-Q separation-logic-examples ""
 Behavior.v
 ModuleIntro.v
 Optimizations.v
