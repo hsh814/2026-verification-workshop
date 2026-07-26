@@ -27,15 +27,29 @@ PRIME_OBJECTS := $(PRIME_SOURCES:.v=.vo)
 PRIME_DEPS := .prime-deps.mk
 PRIME_COQFLAGS := $(COQFLAGS) $(PRIME_LOADPATH)
 
+SL_EXAMPLES_DIR := separation-logic-examples
+SL_LOADPATH := -Q $(SL_EXAMPLES_DIR) ''
+SL_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
+	-type f -name '*.v' | sort)
+SL_OBJECTS := $(SL_SOURCES:.v=.vo)
+SL_DEPS := .sl-deps.mk
+SL_COQFLAGS := $(COQFLAGS) $(SL_LOADPATH)
+
 ifneq ($(filter prime,$(MAKECMDGOALS)),)
 -include $(PRIME_DEPS)
 endif
 
-.PHONY: all prime check clean
+ifneq ($(filter sl,$(MAKECMDGOALS)),)
+-include $(SL_DEPS)
+endif
+
+.PHONY: all prime sl check clean
 
 all: $(OBJECTS)
 
 prime: $(PRIME_OBJECTS)
+
+sl: $(SL_OBJECTS)
 
 $(OBJECTS): %.vo: %.v Makefile
 	@echo "COQC $<"
@@ -47,6 +61,13 @@ $(PRIME_OBJECTS): %.vo: %.v Makefile
 
 $(PRIME_DEPS): Makefile $(PRIME_SOURCES)
 	@$(COQDEP) $(PRIME_LOADPATH) $(PRIME_SOURCES) > $@
+
+$(SL_OBJECTS): %.vo: %.v Makefile
+	@echo "COQC $<"
+	@$(COQC) $(SL_COQFLAGS) $<
+
+$(SL_DEPS): Makefile $(SL_SOURCES)
+	@$(COQDEP) $(SL_LOADPATH) $(SL_SOURCES) > $@
 
 check: all
 	@if grep -nE '(^|[^[:alnum:]_])(Admitted|admit)([^[:alnum:]_]|$$)' \
@@ -64,4 +85,8 @@ clean:
 		\( -name '*.aux' -o -name '*.glob' -o -name '*.vo' \
 		-o -name '*.vok' -o -name '*.vos' -o -name '*.cache' \) \
 		-delete
-	rm -f .lia.cache .nia.cache $(PRIME_DEPS)
+	find $(SL_EXAMPLES_DIR) -type f \
+		\( -name '*.aux' -o -name '*.glob' -o -name '*.vo' \
+		-o -name '*.vok' -o -name '*.vos' -o -name '*.cache' \) \
+		-delete
+	rm -f .lia.cache .nia.cache $(PRIME_DEPS) $(SL_DEPS)
