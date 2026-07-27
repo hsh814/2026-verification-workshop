@@ -1,10 +1,15 @@
 From CRIS Require Import CRIS.
 
-(** Two small compiler optimizations.  The first example has no module-local
-    state, while the second introduces a simple state relation. *)
+(** [RefinementIntro.v] reduced replacement to a simulation judgment:
 
-(** CRIS stores function bodies behind an [Any.t] interface.  This workshop
-    tactic starts the simulation at the typed body and discharges the common
+      ISim.t ... Source Target ...  ->  ctx_refines Target Source
+
+    This file constructs that judgment for two compiler-style transformations.
+    The first has empty module-local state.  The second makes the simulation
+    relation carry a value across private state updates. *)
+
+(** CRIS stores function bodies behind an [Any.t] interface.
+    [cStartTypedFunSim] exposes the typed body and discharges the common
     ill-typed call case. *)
 Ltac cStartTypedFunSim x :=
   cStartFunSim;
@@ -76,8 +81,21 @@ Module PureOptProof. Section PureOptProof.
   Local Definition Source := PureOptSource.t.
   Local Definition Target := PureOptTarget.t.
 
-  (** With no local state to track, the simulation invariant is trivial. *)
+  (** Both local states are empty, so every state pair satisfies [Ist]. *)
   Definition Ist : ist_type Σ := fun _ _ => True%I.
+
+  (** Proof outline.
+
+      [cStartTypedFunSim] exposes the two function bodies.  Unfolding those
+      bodies leaves two matching returns and the obligation to restore
+      [True]. *)
+  Example exercise_simF_fold_constants :
+    ISim.sim_fun open Source Target Ist (fid PureOptHdr.fold_constants).
+  Proof using.
+    cStartTypedFunSim u.
+    unfold PureOptSource.fold_constants, PureOptTarget.fold_constants.
+    (** STOP 1: match the two returns and restore [Ist]. *)
+  Abort.
 
   Lemma simF_fold_constants :
     ISim.sim_fun open Source Target Ist (fid PureOptHdr.fold_constants).
@@ -90,6 +108,8 @@ Module PureOptProof. Section PureOptProof.
   Lemma sim : ISim.t open Source Target emp%I Ist.
   Proof using.
     cStartModSim.
+    (** First establish [Ist] for the initial states, then register the
+        simulation of the exported function. *)
     - iIntros "_". done.
     - apply simF_fold_constants.
   Qed.
@@ -98,7 +118,11 @@ Module PureOptProof. Section PureOptProof.
   Proof using. eapply main_adequacy, sim. Qed.
 End PureOptProof. End PureOptProof.
 
-(** Example 2: store-to-load forwarding with matching local cells. *)
+(** Example 2: store-to-load forwarding with matching local cells.
+
+    The source stores [x], reads the cell, and returns the read value.  The
+    target stores [x] and forwards [x] directly to the return.  Both writes are
+    internal module steps. *)
 Module StateOptHdr.
   Definition mn := "WorkshopStateOptimization".
 
@@ -173,13 +197,29 @@ Module StateOptProof. Section StateOptProof.
         ⌜st_src = {[StateOptSource.cell # x↑]} /\
          st_tgt = {[StateOptTarget.cell # x↑]}⌝)%I.
 
+  (** Proof outline.
+
+      Opening [IST] yields the old cell value.  Both stores establish the
+      input [x] as the new relation witness. *)
+  Example exercise_simF_store_load :
+    ISim.sim_fun open Source Target Ist (fid StateOptHdr.store_load).
+  Proof using.
+    cStartTypedFunSim x.
+    unfold StateOptSource.store_load, StateOptTarget.store_load.
+    iDestruct "IST" as (old) "%". destruct H as [-> ->].
+    cStepsS. cStepsT.
+    (** STOP 2: match the returns and establish [Ist] with witness [x]. *)
+  Abort.
+
   Lemma simF_store_load :
     ISim.sim_fun open Source Target Ist (fid StateOptHdr.store_load).
   Proof using.
     cStartTypedFunSim x.
     unfold StateOptSource.store_load, StateOptTarget.store_load.
     iDestruct "IST" as (old) "%". destruct H as [-> ->].
-    cStepsS. cStepsT. cStep. iSplit; eauto.
+    cStepsS. cStepsT. cStep.
+    iSplit; [eauto |].
+    iExists x. done.
   Qed.
 
   Lemma sim : ISim.t open Source Target emp%I Ist.
@@ -192,3 +232,11 @@ Module StateOptProof. Section StateOptProof.
   Lemma ctxr : ⊢ ctx_refines Target Source.
   Proof using. eapply main_adequacy, sim. Qed.
 End StateOptProof. End StateOptProof.
+
+(** Next: [KVSortedList.v].
+
+    The stateful optimization related two cells with the same representation.
+    A data-structure implementation uses a stronger idea: the source and target
+    states may have different types as long as a representation relation
+    connects every observable operation.  The next file relates an abstract
+    map to a sorted mathematical list. *)

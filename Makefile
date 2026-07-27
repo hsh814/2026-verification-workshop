@@ -12,7 +12,12 @@ COQFLAGS := \
 	-w -cannot-define-projection \
 	-require-import ExtLib.Structures.Monad
 
-SOURCES := Behavior.v Optimizations.v KVSortedList.v
+SOURCES := \
+	Behavior.v \
+	ModuleIntro.v \
+	RefinementIntro.v \
+	Optimizations.v \
+	KVSortedList.v
 OBJECTS := $(SOURCES:.v=.vo)
 
 PRIME_EXAMPLES_DIR := prime-examples

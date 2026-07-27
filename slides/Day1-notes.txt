@@ -1,0 +1,221 @@
+Prompt: Welcome the class and open Behavior.v. State one goal: follow a target module all the way to its observable behaviors.
+Action: Ask everyone to process one Rocq sentence at a time.
+
+---
+
+Prompt: Keep the program fixed and ask whether one proposed trace belongs to its behavior set.
+Action: Process Print Tr.t, Print Beh.t, and Check Beh.of_itree.
+
+---
+
+Prompt: The interaction tree has finished. Its return value appears in the trace.
+Action: Process return_42_terminates. Treat the proof as certification of the example.
+
+---
+
+Prompt: Ask which part of the tree changed and which part of the trace changed.
+Action: Process silent_return_42_terminates and point to Beh.sb_tau.
+
+---
+
+Prompt: Keep choose_bit fixed. Vary only the proposed trace.
+Action: Process the two lemmas and identify the existential witness in Beh.sb_choose.
+
+---
+
+Prompt: An I/O request exposes an observable boundary. A response selects the continuation.
+Action: Process echo_once_reply_9 and echo_once_may_hang.
+
+---
+
+Prompt: Give the class names for finite termination, silent divergence, unanswered I/O, and continuing I/O.
+Action: Process Check Tr.spin. Keep coinduction internals outside today's proof exercises.
+
+---
+
+Prompt: We can now observe a closed tree. Real programs arrive as modules with calls and private state.
+Handoff: Open ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
+
+---
+
+Prompt: A module carries executable bodies and the state those bodies may access.
+Action: Process the initial Check commands in ModuleIntro.v.
+
+---
+
+Prompt: The header gives the boundary a stable name, argument type, and return type.
+Action: Process Check ConstHdr.get.
+
+---
+
+Prompt: Read fnsems as a finite map from the function name to this body.
+Action: Process the ConstModule definitions and fold masks and fsp_none from the spoken explanation.
+
+---
+
+Prompt: ccallU produces a named Call event. Linking will supply its body.
+Action: Process the MainModule definitions.
+
+---
+
+Prompt: Linking supplies the function map. Compilation interprets calls and threads local state. Beh.of_itree program is the behavior set from the first file.
+Action: Process LinkedProgram from top to bottom.
+
+---
+
+Prompt: Preview these operations. The current ConstModule uses an empty state, so the first refinement example can ignore them.
+
+---
+
+Prompt: We have constructed and observed one implementation. Replacement asks for a comparison that survives future clients.
+Handoff: Open RefinementIntro.v.
+
+---
+
+Prompt: Read the inclusion from a target trace toward a source trace.
+Action: Process Check refines_lmod.
+
+---
+
+Prompt: Compilation puts both sides back at the behavior interface from the first file.
+Action: Process refinement_means_behavior_inclusion one line at a time.
+
+---
+
+Prompt: The quantified context can contain any compatible caller and supporting modules.
+Action: Point out that the theorem supports later clients without reopening this proof.
+
+---
+
+Prompt: Ask the class to read each line aloud. The simulation judgment lists the reference side first; the conclusion lists the replacing target first.
+
+---
+
+Prompt: Context enumeration is the specification. Simulation is the reusable proof method.
+Handoff: Process the three Check commands for ISim.sim_fun, ISim.t, and main_adequacy.
+
+---
+
+Prompt: ISim carries a relation Ist between source and target module states. Adequacy returns to the replacement theorem.
+Action: Process simulation_is_enough.
+
+---
+
+Prompt: RefinementIntro supplied the proof ladder. Optimizations.v instantiates every rung.
+Handoff: Open Optimizations.v and fold the implementation of cStartTypedFunSim.
+
+---
+
+Prompt: Identify the function name shared by the two modules. Predict the target/source order of the final ctx_refines theorem.
+
+---
+
+Prompt: A simulation relation records exactly the information needed by future steps. This example needs no stored information.
+
+---
+
+Prompt: sim_fun is the per-function obligation previewed in RefinementIntro.v.
+Action: Enter exercise_simF_fold_constants.
+
+---
+
+Prompt: cStartTypedFunSim handles the Any.t boundary. The unfolded goal exposes the two typed bodies.
+Action: Stop before Abort.
+
+---
+
+Prompt: Give 5–8 minutes. Ask students to name the two obligations created by iSplit.
+Resume: Process the reference simF_fold_constants proof together.
+
+---
+
+Prompt: cStartModSim asks for related initial states and one proof per exported function. main_adequacy closes the ladder from the previous section.
+
+---
+
+Prompt: The target forwards x to the return. Ask what information connects the two private cells before and after the transformation.
+
+---
+
+Prompt: The existential witness records the shared logical value. It can change after a store.
+
+---
+
+Prompt: A simulation relation is an invariant over paired states. Intermediate pairs may fall outside it; the proof restores it at the synchronization point.
+Action: Enter exercise_simF_store_load and stop before Abort.
+
+---
+
+Prompt: Give 15–20 minutes. Ask which value should witness the new existential.
+Resume: Process the reference function proof, module proof, and adequacy line.
+
+---
+
+Prompt: The previous relation connected equal representations. Representation refinement keeps observations aligned across different state types.
+Handoff: Open KVSortedList.v and inspect the public header first.
+
+---
+
+Prompt: The source is the abstract key-value specification. The target is the sorted-list implementation.
+Action: Process KVHdr and compare both initial states.
+
+---
+
+Prompt: The abstract state is already a lookup function. get applies it directly.
+
+---
+
+Prompt: The list lives as one module-local mathematical value. Pointer ownership and allocation belong to a later workshop layer.
+
+---
+
+Prompt: Ask students to state this relation before processing its definition. Then compare their statement with the file.
+
+---
+
+Prompt: Treat the first two as the supplied sequential data-structure library. The simulation uses their combined state_rel_put result.
+
+---
+
+Prompt: Use 15–20 minutes. Keep the focus on choosing the two conjuncts and applying supplied algebra.
+Resume: Process state_rel_empty and state_rel_put.
+
+---
+
+Prompt: Connect this diagram directly to the equal-cell timeline from Optimizations.v.
+Action: Keep the standard Ist wrapper folded. Enter exercise_simF_put and process the supplied setup.
+
+---
+
+Prompt: Give 15–20 minutes. Ask students to identify the representation witnesses before writing tactics.
+Resume: Process the reference simF_put proof.
+Handoff: Put restores the relation with supplied algebra. Get follows the iterator's control flow, so its proof follows the cursor by induction.
+
+---
+
+Prompt: The induction variable is the remaining suffix, not the whole module state.
+Action: Process SortedListTarget.get and point to the anonymous iterator body.
+
+---
+
+Prompt: Lt and Eq terminate. Gt exposes the next cursor after an internal iterator step.
+
+---
+
+Prompt: Generalization gives the source lookup and target iterator the same cursor. The program structure then supplies the induction structure.
+Action: Enter exercise_simF_get and stop before Abort.
+
+---
+
+Prompt: Give 35–45 minutes. First ask everyone to write the four cases on paper. Release the reference proof branch by branch.
+Resume: Process simF_get together and explain aUnfoldT and cStepT at the Gt branch.
+
+---
+
+Prompt: The initial empty states satisfy the relation. Each exported operation preserves it. Adequacy gives the replacement theorem.
+Action: Process sim and ctxr as an instructor-led closing proof.
+
+---
+
+Prompt: Trace the whole chain aloud: behavior, module, refinement, simulation, state relation, iterator induction, contextual refinement.
+Close: Ask each student which relation witness changed in STOP 2 and STOP 5.

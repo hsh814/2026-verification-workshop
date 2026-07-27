@@ -4,18 +4,38 @@ Workshop materials for Rocq and CRIS.
 
 ## Workshop content
 
-TBA. The lecture content is in development.
+Day 1 follows one continuous question: how does a modular implementation
+produce only behaviors permitted by its specification?
 
-The repository contains two guided lecture files and two exercise files:
+Open these files in order:
 
-- `Behavior.v` introduces behaviors with small executable examples.
-- `ModuleIntro.v` packages a function in a module, calls it from an entry
-  module, and links the modules into a closed program.
-- `Optimizations.v` proves stateless constant folding and stateful
-  store-to-load forwarding.
-- `KVSortedList.v` proves that a sorted-list implementation refines an
-  abstract key-value store. Its `get` operation traverses the list one cell at
-  a time with `ITree.iter`.
+| Order | File | Question carried through the file |
+|---:|---|---|
+| 1 | `Behavior.v` | What is one observable behavior of a closed interaction tree? |
+| 2 | `ModuleIntro.v` | How do calls, linking, and compilation produce that closed tree? |
+| 3 | `RefinementIntro.v` | When may a target module replace a source module in every context? |
+| 4 | `Optimizations.v` | How does a direct `ISim` proof establish refinement, first without state and then with related cells? |
+| 5 | `KVSortedList.v` | How can an abstract map be refined by a sorted list whose lookup uses `ITree.iter`? |
+
+The first three files are guided lecture demos. The final two contain complete
+reference proofs and six `STOP` exercises. At a `STOP`, replace the following
+`Abort` with a proof and `Qed`. The reference proof immediately below lets the
+class resume the common flow after each exercise.
+
+The corresponding presentation is
+[`slides/Day1.md`](slides/Day1.md). A generated PDF is provided as
+[`slides/Day1.pdf`](slides/Day1.pdf), with the presenter prompts extracted in
+[`slides/Day1-notes.txt`](slides/Day1-notes.txt).
+
+### Day 1 timing
+
+| Block | Time | Material |
+|---|---:|---|
+| Theory 1 | 60 minutes | Rocq foundations and interaction trees (professor-led) |
+| Theory 2 | 60 minutes | `Behavior.v` through refinement and the first stateless simulation |
+| Hands-on block 1 | 120 minutes | optimization exercises, then the KV representation relation |
+| Break | 30 minutes | |
+| Hands-on block 2 | 90 minutes | KV `put`, iterator induction for `get`, and guided final assembly |
 
 ## Requirements
 
@@ -136,8 +156,12 @@ the end.
 |---|---|
 | `Behavior.v` | Guided examples of terminating, nondeterministic, and I/O behaviors |
 | `ModuleIntro.v` | Stateless modules, function calls, linking, and compilation |
+| `RefinementIntro.v` | Behavior inclusion, contextual refinement, and the simulation-to-refinement bridge |
 | `Optimizations.v` | Stateless and stateful compiler-optimization refinements |
 | `KVSortedList.v` | Sorted-list implementation versus abstract key-value storage |
+| `slides/Day1.md` | Marp source synchronized with the Rocq file order and `STOP` exercises |
+| `slides/Day1.pdf` | Generated presentation PDF |
+| `slides/Day1-notes.txt` | Presenter prompts extracted from the Marp source |
 
 ## Troubleshooting
 

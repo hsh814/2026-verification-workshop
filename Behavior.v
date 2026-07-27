@@ -2,16 +2,21 @@ From CRIS Require Import CRIS.
 
 (** A behavior is an observable trace of an interaction tree.
 
-    Process the [Check] commands one at a time in the editor.  The proofs are
-    complete; they are here only to justify the examples, not as exercises.
+    The [Check] commands expose the relevant types.  The complete proofs
+    certify the example behaviors.
 
     A proposition [Beh.of_itree program trace] says that [trace] is one
-    behavior of [program].  It is a membership statement, not a complete
-    characterization of every behavior of [program]. *)
+    behavior of [program].  It is a membership statement.  Several such
+    propositions may hold for the same program. *)
 
 Print Tr.t.
 Print Beh.t.
 Check Beh.of_itree.
+Check Tr.spin.
+
+(** [Tr.spin] is the observable trace of infinite silent execution.  The
+    examples below focus on finite termination, nondeterminism, and I/O; the
+    trace type already has a constructor for divergence. *)
 
 (** Returning a value produces a terminating trace. *)
 
@@ -103,3 +108,10 @@ Qed.
 
 Check echo_once_reply_9.
 Check echo_once_may_hang.
+
+(** Next: [ModuleIntro.v].
+
+    [Beh.of_itree] observes a closed tree of type [itree coreE Any.t].  Programs
+    are usually written as several modules whose function bodies may call one
+    another and access private state.  [ModuleIntro.v] constructs the closed
+    interaction tree passed to [Beh.of_itree]. *)

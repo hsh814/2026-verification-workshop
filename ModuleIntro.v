@@ -1,19 +1,15 @@
 From CRIS Require Import CRIS.
 
-(** A CRIS module packages named function bodies and private initial state.
+(** [Behavior.v] showed how CRIS observes a closed [itree coreE].  A CRIS
+    module packages the named function bodies and private initial state from
+    which that closed tree is built.
 
-    Process the [Check] commands one at a time in the editor.  This file follows
-    one call from an entry module to a service module, then links the modules
-    into a closed program. *)
+    The definitions below follow one call from an entry module to a service
+    module, then link the modules into a closed program.  Each [Check] reports
+    the type of a concrete object immediately after its definition. *)
 
-Check SMod.t.
-Check SMod.fnsems.
-Check SMod.initial_st.
-Check Mod.t.
-Check Mod.add.
-Check LMod.compile.
-
-(** The header gives the exported function a name and a type. *)
+(** The header gives the exported function a name and the signature
+    [unit -> Z]. *)
 
 Module ConstHdr.
   Definition mn := "WorkshopConst".
@@ -25,9 +21,9 @@ End ConstHdr.
 
 Check ConstHdr.get.
 
-(** The service module implements [get()].  For this demo, read the [fnsems]
-    entry as a mapping from [ConstHdr.get] to its body.  The mask and
-    [fsp_none] fields stay fixed. *)
+(** The service module implements [get()].  Its [fnsems] entry maps
+    [ConstHdr.get] to the function body.  The mask and [fsp_none] fields stay
+    fixed. *)
 
 Module ConstModule. Section ConstModule.
   Context `{!crisG Γ Σ α β τ _S _I}.
@@ -37,10 +33,16 @@ Module ConstModule. Section ConstModule.
   Definition get : () -> itree crisE Z :=
     fun _ => Ret 42%Z.
 
+  (** The implementation receives [unit] and returns [Z] in [itree crisE]. *)
+  Check get.
+
   Definition fnsems : fnsemmap :=
     {[fid ConstHdr.get #
         (msk_scp scopes msk_true,
          (fsp_none, cfunU ConstHdr.get get))]}.
+
+  (** [fnsems] registers the implementation under [fid ConstHdr.get]. *)
+  Check fnsems.
 
   Program Definition smod : SMod.t := {|
     SMod.scopes := scopes;
@@ -49,11 +51,15 @@ Module ConstModule. Section ConstModule.
   |}.
   Solve All Obligations with mod_tac.
 
-  Definition t : Mod.t := SMod.to_mod ∅ smod.
-
-  Check get.
-  Print get.
+  (** [smod] packages its scopes, function semantics, and initial local state.
+      Applying the record projections reveals the type of each field. *)
   Check smod.
+  Check (SMod.scopes smod).
+  Check (SMod.fnsems smod).
+  Check (SMod.initial_st smod).
+
+  (** [SMod.to_mod] produces a linkable [Mod.t]. *)
+  Definition t : Mod.t := SMod.to_mod ∅ smod.
   Check t.
 End ConstModule. End ConstModule.
 
@@ -65,15 +71,24 @@ Module MainModule. Section MainModule.
 
   Definition scopes : list string := [].
 
+  (** The header determines the argument and result types of [ccallU]. *)
+  Check (ccallU ConstHdr.get : () -> itree crisE Z).
+
   Definition main : Any.t -> itree crisE Any.t :=
     fun _ =>
       n <- ccallU ConstHdr.get tt;;
       Ret n↑.
 
+  (** The entry function uses CRIS's [Any.t] program interface. *)
+  Check main.
+
   Definition fnsems : fnsemmap :=
     {[entry #
         (msk_scp scopes msk_true,
          (fsp_none, main))]}.
+
+  (** This map registers [main] under the distinguished [entry] name. *)
+  Check fnsems.
 
   Program Definition smod : SMod.t := {|
     SMod.scopes := scopes;
@@ -82,10 +97,9 @@ Module MainModule. Section MainModule.
   |}.
   Solve All Obligations with mod_tac.
 
-  Definition t : Mod.t := SMod.to_mod ∅ smod.
-
-  Check main.
   Check smod.
+
+  Definition t : Mod.t := SMod.to_mod ∅ smod.
   Check t.
 End MainModule. End MainModule.
 
@@ -98,11 +112,28 @@ Module LinkedProgram. Section LinkedProgram.
 
   Definition modules : Mod.t := MainModule.t ★ ConstModule.t.
 
-  Definition program : itree coreE Any.t :=
-    LMod.compile (Mod.to_lmod modules ε) tt↑.
-
+  (** Linking two [Mod.t] objects produces another [Mod.t]. *)
   Check modules.
+
+  Definition linked : LMod.t := Mod.to_lmod modules ε.
+
+  (** [Mod.to_lmod] produces the [LMod.t] consumed by [LMod.compile]. *)
+  Check linked.
+
+  Definition program : itree coreE Any.t :=
+    LMod.compile linked tt↑.
+
+  (** Compilation produces the closed interaction tree from [Behavior.v]. *)
   Check program.
+
+  (** Partial application gives a predicate on traces.  Supplying a trace
+      gives one concrete behavior proposition. *)
   Check (Beh.of_itree program).
   Check (Beh.of_itree program (Tr.done (42%Z)↑)).
 End LinkedProgram. End LinkedProgram.
+
+(** Next: [RefinementIntro.v].
+
+    Linking and compilation gave one closed program and its behaviors.  A
+    compiler or library implementation must establish when another module may
+    replace [ConstModule] in every compatible linking context. *)

@@ -11,5 +11,6 @@
 -Q prime-examples/imp_system CRIS.imp_system
 Behavior.v
 ModuleIntro.v
+RefinementIntro.v
 Optimizations.v
 KVSortedList.v
