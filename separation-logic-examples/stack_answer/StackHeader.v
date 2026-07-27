@@ -1,0 +1,13 @@
+(** * Linked-List Stack Interface *)
+
+From CRIS.common Require Import CRIS.
+From mem_answer Require Export MemHeader.
+
+Module StackHdr.
+  Definition new_stack :=
+    fnsig "Stack.new_stack" (fntyp unit loc).
+  Definition push :=
+    fnsig "Stack.push" (fntyp (loc * nat) unit).
+  Definition pop :=
+    fnsig "Stack.pop" (fntyp loc (option nat)).
+End StackHdr.

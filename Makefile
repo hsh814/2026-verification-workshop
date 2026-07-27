@@ -32,15 +32,40 @@ PRIME_OBJECTS := $(PRIME_SOURCES:.v=.vo)
 PRIME_DEPS := .prime-deps.mk
 PRIME_COQFLAGS := $(COQFLAGS) $(PRIME_LOADPATH)
 
-ifneq ($(filter prime,$(MAKECMDGOALS)),)
+SL_EXAMPLES_DIR := separation-logic-examples
+SL_LOADPATH := \
+	-Q $(SL_EXAMPLES_DIR) '' \
+	-Q $(IMP_SYSTEM_DIR) CRIS.imp_system
+SL_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
+	-type f -name '*.v' | sort)
+SL_OBJECTS := $(SL_SOURCES:.v=.vo)
+SL_ANSWER_SOURCES := $(shell find $(SL_EXAMPLES_DIR) \
+	-type f -path '*_answer/*.v' | sort)
+SL_DEPS := .sl-deps.mk
+SL_COQFLAGS := $(COQFLAGS) $(SL_LOADPATH)
+
+ifneq ($(filter prime sl,$(MAKECMDGOALS)),)
 -include $(PRIME_DEPS)
 endif
 
-.PHONY: all prime check clean
+ifneq ($(filter sl,$(MAKECMDGOALS)),)
+-include $(SL_DEPS)
+endif
+
+.PHONY: all prime sl check check-sl-answers clean
 
 all: $(OBJECTS)
 
 prime: $(PRIME_OBJECTS)
+
+sl: $(SL_OBJECTS) check-sl-answers
+
+check-sl-answers:
+	@if grep -nE '(^|[^[:alnum:]_])(Admitted|admit)([^[:alnum:]_]|$$)' \
+		$(SL_ANSWER_SOURCES); then \
+		echo "Unexpected admitted proof in separation-logic answers" >&2; \
+		exit 1; \
+	fi
 
 $(OBJECTS): %.vo: %.v Makefile
 	@echo "COQC $<"
@@ -52,6 +77,13 @@ $(PRIME_OBJECTS): %.vo: %.v Makefile
 
 $(PRIME_DEPS): Makefile $(PRIME_SOURCES)
 	@$(COQDEP) $(PRIME_LOADPATH) $(PRIME_SOURCES) > $@
+
+$(SL_OBJECTS): %.vo: %.v Makefile
+	@echo "COQC $<"
+	@$(COQC) $(SL_COQFLAGS) $<
+
+$(SL_DEPS): Makefile $(SL_SOURCES)
+	@$(COQDEP) $(SL_LOADPATH) $(SL_SOURCES) > $@
 
 check: all
 	@if grep -nE '(^|[^[:alnum:]_])(Admitted|admit)([^[:alnum:]_]|$$)' \
@@ -69,4 +101,8 @@ clean:
 		\( -name '*.aux' -o -name '*.glob' -o -name '*.vo' \
 		-o -name '*.vok' -o -name '*.vos' -o -name '*.cache' \) \
 		-delete
-	rm -f .lia.cache .nia.cache $(PRIME_DEPS)
+	find $(SL_EXAMPLES_DIR) -type f \
+		\( -name '*.aux' -o -name '*.glob' -o -name '*.vo' \
+		-o -name '*.vok' -o -name '*.vos' -o -name '*.cache' \) \
+		-delete
+	rm -f .lia.cache .nia.cache $(PRIME_DEPS) $(SL_DEPS)
