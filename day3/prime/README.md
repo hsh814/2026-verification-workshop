@@ -79,16 +79,11 @@ ITree rather than an `fspec_simple`.
   ```coq
   fun _ =>
     n <- trigger (IO "input" ());;
-    ret <- trigger (Choose nat);;
-    guarantee (ret = nth_prime n);;;
-    Ret ret
+    Ret (nth_prime n).
   ```
 
-  This is the lowercase pure `guarantee`, so the relation to `nth_prime`
-  requires no Iris resource.
-
 - `PrimeIAproof.v`: Exercise 3, the client proof against `LListA`.
-- `PrimeAll.v`: Exercise 4, memory abstraction, proof-layer composition,
+- `PrimeAll.v`: Exercise 4 (optional), memory abstraction, proof-layer composition,
   cancellation, and the final behavioral-refinement theorem.
 
 Every intended edit location starts with `TODO`; all other boilerplate is
