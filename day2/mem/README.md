@@ -56,7 +56,7 @@ the next `Admitted`. Use `cStartFunSim`, `cStepsS`, `cStepsT`, `cForceS`,
 From the repository root, the full exercise collection builds with:
 
 ```sh
-opam exec --switch=. -- make sl
+make day2
 ```
 
 The completed version is in `../mem_answer/`.

@@ -1,4 +1,4 @@
-Prompt: Welcome the class and open Behavior.v. State one goal: follow a target module all the way to its observable behaviors.
+Prompt: Welcome the class and open day1/lectures/Behavior.v. State one goal: follow a target module all the way to its observable behaviors.
 Action: Ask everyone to process one Rocq sentence at a time.
 
 ---
@@ -34,12 +34,12 @@ Action: Process Check Tr.spin. Keep coinduction internals outside today's proof 
 ---
 
 Prompt: We can now observe a closed tree. Real programs arrive as modules with calls and private state.
-Handoff: Open ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
+Handoff: Open day1/lectures/ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
 
 ---
 
 Prompt: A module carries executable bodies and the state those bodies may access.
-Action: Process the initial Check commands in ModuleIntro.v.
+Action: Process the initial Check commands in day1/lectures/ModuleIntro.v.
 
 ---
 
@@ -68,7 +68,7 @@ Prompt: Preview these operations. The current ConstModule uses an empty state, s
 ---
 
 Prompt: We have constructed and observed one implementation. Replacement asks for a comparison that survives future clients.
-Handoff: Open RefinementIntro.v.
+Handoff: Open day1/lectures/RefinementIntro.v.
 
 ---
 
@@ -101,8 +101,8 @@ Action: Process simulation_is_enough.
 
 ---
 
-Prompt: RefinementIntro supplied the proof ladder. Optimizations.v instantiates every rung.
-Handoff: Open Optimizations.v and fold the implementation of cStartTypedFunSim.
+Prompt: day1/lectures/RefinementIntro.v supplied the proof ladder. day1/exercises/Optimizations.v instantiates every rung.
+Handoff: Open day1/exercises/Optimizations.v and fold the implementation of cStartTypedFunSim.
 
 ---
 
@@ -114,18 +114,18 @@ Prompt: A simulation relation records exactly the information needed by future s
 
 ---
 
-Prompt: sim_fun is the per-function obligation previewed in RefinementIntro.v.
-Action: Enter exercise_simF_fold_constants.
+Prompt: sim_fun is the per-function obligation previewed in day1/lectures/RefinementIntro.v.
+Action: Enter simF_fold_constants.
 
 ---
 
 Prompt: cStartTypedFunSim handles the Any.t boundary. The unfolded goal exposes the two typed bodies.
-Action: Stop before Abort.
+Action: Stop at Admitted.
 
 ---
 
 Prompt: Give 5–8 minutes. Ask students to name the two obligations created by iSplit.
-Resume: Process the reference simF_fold_constants proof together.
+Resume: Open day1/answers/Optimizations.v and process its simF_fold_constants proof together.
 
 ---
 
@@ -142,17 +142,17 @@ Prompt: The existential witness records the shared logical value. It can change 
 ---
 
 Prompt: A simulation relation is an invariant over paired states. Intermediate pairs may fall outside it; the proof restores it at the synchronization point.
-Action: Enter exercise_simF_store_load and stop before Abort.
+Action: In day1/exercises/Optimizations.v, enter simF_store_load and stop at Admitted.
 
 ---
 
 Prompt: Give 15–20 minutes. Ask which value should witness the new existential.
-Resume: Process the reference function proof, module proof, and adequacy line.
+Resume: Open day1/answers/Optimizations.v and process the function proof, module proof, and adequacy line.
 
 ---
 
 Prompt: The previous relation connected equal representations. Representation refinement keeps observations aligned across different state types.
-Handoff: Open KVSortedList.v and inspect the public header first.
+Handoff: Open day1/exercises/KVSortedList.v and inspect the public header first.
 
 ---
 
@@ -178,17 +178,17 @@ Prompt: Treat the first two as the supplied sequential data-structure library. T
 ---
 
 Prompt: Use 15–20 minutes. Keep the focus on choosing the two conjuncts and applying supplied algebra.
-Resume: Process state_rel_empty and state_rel_put.
+Resume: Open day1/answers/KVSortedList.v and process state_rel_empty and state_rel_put.
 
 ---
 
-Prompt: Connect this diagram directly to the equal-cell timeline from Optimizations.v.
-Action: Keep the standard Ist wrapper folded. Enter exercise_simF_put and process the supplied setup.
+Prompt: Connect this diagram directly to the equal-cell timeline from day1/exercises/Optimizations.v.
+Action: In day1/exercises/KVSortedList.v, keep the standard Ist wrapper folded. Enter simF_put and process the supplied setup.
 
 ---
 
 Prompt: Give 15–20 minutes. Ask students to identify the representation witnesses before writing tactics.
-Resume: Process the reference simF_put proof.
+Resume: Open day1/answers/KVSortedList.v and process its simF_put proof.
 Handoff: Put restores the relation with supplied algebra. Get follows the iterator's control flow, so its proof follows the cursor by induction.
 
 ---
@@ -203,12 +203,12 @@ Prompt: Lt and Eq terminate. Gt exposes the next cursor after an internal iterat
 ---
 
 Prompt: Generalization gives the source lookup and target iterator the same cursor. The program structure then supplies the induction structure.
-Action: Enter exercise_simF_get and stop before Abort.
+Action: In day1/exercises/KVSortedList.v, enter simF_get and stop at Admitted.
 
 ---
 
-Prompt: Give 35–45 minutes. First ask everyone to write the four cases on paper. Release the reference proof branch by branch.
-Resume: Process simF_get together and explain aUnfoldT and cStepT at the Gt branch.
+Prompt: Give 35–45 minutes. First ask everyone to write the four cases on paper. Release the answer proof branch by branch.
+Resume: Open day1/answers/KVSortedList.v, process simF_get together, and explain aUnfoldT and cStepT at the Gt branch.
 
 ---
 

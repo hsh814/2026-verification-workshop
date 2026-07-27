@@ -77,13 +77,13 @@ Program Verification Workshop 2026
 Day 1 · CRIS fundamentals and guided proofs
 
 <!--
-Prompt: Welcome the class and open Behavior.v. State one goal: follow a target module all the way to its observable behaviors.
+Prompt: Welcome the class and open day1/lectures/Behavior.v. State one goal: follow a target module all the way to its observable behaviors.
 Action: Ask everyone to process one Rocq sentence at a time.
 -->
 
 ---
 
-<span class="file">Behavior.v</span>
+<span class="file">day1/lectures/Behavior.v</span>
 
 # What can this program do?
 
@@ -222,16 +222,16 @@ Action: Process Check Tr.spin. Keep coinduction internals outside today's proof 
          Beh.of_itree
 ```
 
-Open `ModuleIntro.v`.
+Open `day1/lectures/ModuleIntro.v`.
 
 <!--
 Prompt: We can now observe a closed tree. Real programs arrive as modules with calls and private state.
-Handoff: Open ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
+Handoff: Open day1/lectures/ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
 -->
 
 ---
 
-<span class="file">ModuleIntro.v</span>
+<span class="file">day1/lectures/ModuleIntro.v</span>
 
 # A module packages code and state
 
@@ -248,7 +248,7 @@ Function bodies have type `itree crisE ...`.
 
 <!--
 Prompt: A module carries executable bodies and the state those bodies may access.
-Action: Process the initial Check commands in ModuleIntro.v.
+Action: Process the initial Check commands in day1/lectures/ModuleIntro.v.
 -->
 
 ---
@@ -367,16 +367,16 @@ MainModule ★ TargetService
 The client was chosen today. A reusable replacement theorem must support clients
 chosen later.
 
-Open `RefinementIntro.v`.
+Open `day1/lectures/RefinementIntro.v`.
 
 <!--
 Prompt: We have constructed and observed one implementation. Replacement asks for a comparison that survives future clients.
-Handoff: Open RefinementIntro.v.
+Handoff: Open day1/lectures/RefinementIntro.v.
 -->
 
 ---
 
-<span class="file">RefinementIntro.v</span>
+<span class="file">day1/lectures/RefinementIntro.v</span>
 
 # Target behaviors are allowed by the source
 
@@ -506,16 +506,16 @@ Source: return (1 + 2)
 Target: return 3
 ```
 
-Open `Optimizations.v`.
+Open `day1/exercises/Optimizations.v`.
 
 <!--
-Prompt: RefinementIntro supplied the proof ladder. Optimizations.v instantiates every rung.
-Handoff: Open Optimizations.v and fold the implementation of cStartTypedFunSim.
+Prompt: day1/lectures/RefinementIntro.v supplied the proof ladder. day1/exercises/Optimizations.v instantiates every rung.
+Handoff: Open day1/exercises/Optimizations.v and fold the implementation of cStartTypedFunSim.
 -->
 
 ---
 
-<span class="file">Optimizations.v · Example 1</span>
+<span class="file">day1/exercises/Optimizations.v · Example 1</span>
 
 # One interface, two bodies
 
@@ -566,8 +566,8 @@ one exported function
 ```
 
 <!--
-Prompt: sim_fun is the per-function obligation previewed in RefinementIntro.v.
-Action: Enter exercise_simF_fold_constants.
+Prompt: sim_fun is the per-function obligation previewed in day1/lectures/RefinementIntro.v.
+Action: Enter simF_fold_constants.
 -->
 
 ---
@@ -590,7 +590,7 @@ post:   restore Ist
 
 <!--
 Prompt: cStartTypedFunSim handles the Any.t boundary. The unfolded goal exposes the two typed bodies.
-Action: Stop before Abort.
+Action: Stop at Admitted.
 -->
 
 ---
@@ -599,20 +599,22 @@ Action: Stop before Abort.
 
 <div class="stop">
 
-Complete `exercise_simF_fold_constants`.
+Complete `simF_fold_constants`.
 
 ```coq
 (* match the returns *)
 (* restore Ist *)
 ```
 
-Replace `Abort` with your proof and `Qed`.
+Replace `Admitted` with your proof and `Qed`.
+
+Reference solution: `day1/answers/Optimizations.v`
 
 </div>
 
 <!--
 Prompt: Give 5–8 minutes. Ask students to name the two obligations created by iSplit.
-Resume: Process the reference simF_fold_constants proof together.
+Resume: Open day1/answers/Optimizations.v and process its simF_fold_constants proof together.
 -->
 
 ---
@@ -637,7 +639,7 @@ Prompt: cStartModSim asks for related initial states and one proof per exported 
 
 ---
 
-<span class="file">Optimizations.v · Example 2</span>
+<span class="file">day1/exercises/Optimizations.v · Example 2</span>
 
 # Store-to-load forwarding
 
@@ -696,7 +698,7 @@ cStepsS. cStepsT.
 
 <!--
 Prompt: A simulation relation is an invariant over paired states. Intermediate pairs may fall outside it; the proof restores it at the synchronization point.
-Action: Enter exercise_simF_store_load and stop before Abort.
+Action: In day1/exercises/Optimizations.v, enter simF_store_load and stop at Admitted.
 -->
 
 ---
@@ -705,20 +707,22 @@ Action: Enter exercise_simF_store_load and stop before Abort.
 
 <div class="stop">
 
-Complete `exercise_simF_store_load`.
+Complete `simF_store_load`.
 
 ```coq
 (* match the final returns *)
 (* choose x as the new relation witness *)
 ```
 
-Replace `Abort` with your proof and `Qed`.
+Replace `Admitted` with your proof and `Qed`.
+
+Reference solution: `day1/answers/Optimizations.v`
 
 </div>
 
 <!--
 Prompt: Give 15–20 minutes. Ask which value should witness the new existential.
-Resume: Process the reference function proof, module proof, and adequacy line.
+Resume: Open day1/answers/Optimizations.v and process the function proof, module proof, and adequacy line.
 -->
 
 ---
@@ -733,16 +737,16 @@ equal integer cells
 abstract map  ~  sorted list
 ```
 
-Open `KVSortedList.v`.
+Open `day1/exercises/KVSortedList.v`.
 
 <!--
 Prompt: The previous relation connected equal representations. Representation refinement keeps observations aligned across different state types.
-Handoff: Open KVSortedList.v and inspect the public header first.
+Handoff: Open day1/exercises/KVSortedList.v and inspect the public header first.
 -->
 
 ---
 
-<span class="file">KVSortedList.v</span>
+<span class="file">day1/exercises/KVSortedList.v</span>
 
 # One API, two private representations
 
@@ -851,8 +855,8 @@ Prompt: Treat the first two as the supplied sequential data-structure library. T
 
 <div class="stop">
 
-1. Prove `exercise_state_rel_empty`.
-2. Prove `exercise_state_rel_put` using the provided lemmas.
+1. Prove `state_rel_empty`.
+2. Prove `state_rel_put` using the provided lemmas.
 
 ```text
 empty_map  ~  []
@@ -860,11 +864,13 @@ empty_map  ~  []
 map_put m k v  ~  list_put k v xs
 ```
 
+Reference solution: `day1/answers/KVSortedList.v`
+
 </div>
 
 <!--
 Prompt: Use 15–20 minutes. Keep the focus on choosing the two conjuncts and applying supplied algebra.
-Resume: Process state_rel_empty and state_rel_put.
+Resume: Open day1/answers/KVSortedList.v and process state_rel_empty and state_rel_put.
 -->
 
 ---
@@ -884,8 +890,8 @@ cFinishKVReturn Hupdated.
 ```
 
 <!--
-Prompt: Connect this diagram directly to the equal-cell timeline from Optimizations.v.
-Action: Keep the standard Ist wrapper folded. Enter exercise_simF_put and process the supplied setup.
+Prompt: Connect this diagram directly to the equal-cell timeline from day1/exercises/Optimizations.v.
+Action: In day1/exercises/KVSortedList.v, keep the standard Ist wrapper folded. Enter simF_put and process the supplied setup.
 -->
 
 ---
@@ -894,7 +900,7 @@ Action: Keep the standard Ist wrapper folded. Enter exercise_simF_put and proces
 
 <div class="stop">
 
-Complete `exercise_simF_put`.
+Complete `simF_put`.
 
 ```coq
 pose proof (state_rel_put m xs k v Hrel) as Hupdated.
@@ -903,11 +909,13 @@ cFinishKVReturn Hupdated.
 
 `Hupdated` is the mathematical step; the second tactic handles CRIS bookkeeping.
 
+Reference solution: `day1/answers/KVSortedList.v`
+
 </div>
 
 <!--
 Prompt: Give 15–20 minutes. Ask students to identify the representation witnesses before writing tactics.
-Resume: Process the reference simF_put proof.
+Resume: Open day1/answers/KVSortedList.v and process its simF_put proof.
 Handoff: Put restores the relation with supplied algebra. Get follows the iterator's control flow, so its proof follows the cursor by induction.
 -->
 
@@ -980,7 +988,7 @@ iInduction cursor as [|[k' v'] tl] "IH".
 
 <!--
 Prompt: Generalization gives the source lookup and target iterator the same cursor. The program structure then supplies the induction structure.
-Action: Enter exercise_simF_get and stop before Abort.
+Action: In day1/exercises/KVSortedList.v, enter simF_get and stop at Admitted.
 -->
 
 ---
@@ -989,7 +997,7 @@ Action: Enter exercise_simF_get and stop before Abort.
 
 <div class="stop">
 
-Complete `exercise_simF_get`.
+Complete `simF_get`.
 
 ```coq
 iInduction cursor as [|[k' v'] tl] "IH".
@@ -998,11 +1006,13 @@ iInduction cursor as [|[k' v'] tl] "IH".
 Use `cFinishKVReturn Hstate` in the terminating cases.<br>
 Use `cStepT; iApply "IH"` in the `Gt` case.
 
+Reference solution: `day1/answers/KVSortedList.v`
+
 </div>
 
 <!--
-Prompt: Give 35–45 minutes. First ask everyone to write the four cases on paper. Release the reference proof branch by branch.
-Resume: Process simF_get together and explain aUnfoldT and cStepT at the Gt branch.
+Prompt: Give 35–45 minutes. First ask everyone to write the four cases on paper. Release the answer proof branch by branch.
+Resume: Open day1/answers/KVSortedList.v, process simF_get together, and explain aUnfoldT and cStepT at the Gt branch.
 -->
 
 ---

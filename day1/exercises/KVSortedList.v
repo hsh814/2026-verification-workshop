@@ -119,8 +119,8 @@ Module SortedListTarget. Section SortedListTarget.
           end)
         xs.
 
-  (** Insertion remains a direct list function so the exercise can focus on
-      the induction caused by [get]'s iterator. *)
+  (** Insertion uses a direct list function.  The induction in this file comes
+      from [get]'s iterator. *)
   Definition put : Z * Z -> itree crisE () :=
     fun kv =>
       let '(k, v) := kv in
@@ -230,30 +230,18 @@ Module KVSortedListProof.
         * exact IH.
   Qed.
 
-  Example exercise_state_rel_empty : state_rel empty_map [].
+  Lemma state_rel_empty : state_rel empty_map [].
   Proof.
     (** STOP 3: unfold the relation and prove its two conjuncts. *)
-  Abort.
+  Admitted.
 
-  Lemma state_rel_empty : state_rel empty_map [].
-  Proof. split; [constructor | reflexivity]. Qed.
-
-  Example exercise_state_rel_put m xs k v :
+  Lemma state_rel_put m xs k v :
     state_rel m xs -> state_rel (map_put m k v) (list_put k v xs).
   Proof.
     intros Hrel.
     (** STOP 4: use [sorted_keys_put], [list_get_put], and the two
         conjuncts of [Hrel]. *)
-  Abort.
-
-  Lemma state_rel_put m xs k v :
-    state_rel m xs -> state_rel (map_put m k v) (list_put k v xs).
-  Proof.
-    intros [Hsorted Hlookup]. split.
-    - apply sorted_keys_put. exact Hsorted.
-    - intros q. rewrite list_get_put /map_put.
-      destruct (Z.eq_dec q k); [reflexivity | apply Hlookup].
-  Qed.
+  Admitted.
 
   Section Refinement.
     Context `{!crisG Γ Σ α β τ _S _I}.
@@ -316,7 +304,7 @@ Module KVSortedListProof.
 
         Both modules update local state.  [state_rel_put] relates the updated
         map and list, and [cFinishKVReturn] restores [Ist]. *)
-    Example exercise_simF_put :
+    Lemma simF_put :
       ISim.sim_fun open Source Target Ist (fid KVHdr.put).
     Proof.
       cStartKVPutSim k v.
@@ -324,17 +312,7 @@ Module KVSortedListProof.
       cStepsS. cStepsT.
       (** STOP 5: obtain [Hupdated] with [state_rel_put], then finish the
           matching returns with [cFinishKVReturn Hupdated]. *)
-    Abort.
-
-    Lemma simF_put :
-      ISim.sim_fun open Source Target Ist (fid KVHdr.put).
-    Proof.
-      cStartKVPutSim k v.
-      rename x into m. rename x0 into xs. rename H4 into Hrel.
-      cStepsS. cStepsT.
-      pose proof (state_rel_put m xs k v Hrel) as Hupdated.
-      cFinishKVReturn Hupdated.
-    Qed.
+    Admitted.
 
     (** Proof outline for [get].
 
@@ -342,7 +320,7 @@ Module KVSortedListProof.
         suffix through [ITree.iter].  Pointwise lookup agreement rewrites the
         source result.  Generalizing the initial list exposes that suffix as
         [cursor], and induction follows the cursor. *)
-    Example exercise_simF_get :
+    Lemma simF_get :
       ISim.sim_fun open Source Target Ist (fid KVHdr.get).
     Proof.
       cStartKVGetSim k.
@@ -354,24 +332,7 @@ Module KVSortedListProof.
       (** STOP 6: use [iInduction cursor].  [cFinishKVReturn Hstate]
           closes each terminating case; the [Gt] case takes one target step
           and applies the induction hypothesis. *)
-    Abort.
-
-    Lemma simF_get :
-      ISim.sim_fun open Source Target Ist (fid KVHdr.get).
-    Proof.
-      cStartKVGetSim k.
-      rename x into m. rename x0 into xs. rename H4 into Hrel.
-      cStepsS. cStepsT.
-      pose proof Hrel as Hstate.
-      destruct Hrel as [_ Hlookup]. rewrite Hlookup.
-      generalize xs at 1 3. iIntros (cursor).
-      iInduction cursor as [|[k' v'] tl] "IH".
-      - aUnfoldT. cFinishKVReturn Hstate.
-      - aUnfoldT. simpl. destruct (Z.compare k k') eqn:Hcmp.
-        + cFinishKVReturn Hstate.
-        + cFinishKVReturn Hstate.
-        + cStepT. iApply "IH".
-    Qed.
+    Admitted.
 
     (** Module assembly.
 

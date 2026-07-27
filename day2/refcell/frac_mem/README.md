@@ -37,5 +37,5 @@ After compiling dependencies once, iterate with Coqtail:
 From the repository root, all separation-logic examples build with:
 
 ```sh
-opam exec --switch=. -- make sl
+make day2
 ```

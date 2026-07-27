@@ -56,7 +56,7 @@ End ContextualRefinement.
       simulation:  ISim.t ... Source Target ...
       conclusion:  ctx_refines Target Source
 
-    Next: [Optimizations.v].
+    Next: day1/exercises/Optimizations.v.
 
     What does a simulation proof look like for actual function bodies?  The
     next file starts with a stateless constant-folding example, where the state

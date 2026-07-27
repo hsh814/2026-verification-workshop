@@ -34,5 +34,5 @@ it never unfolds either resource into raw `own` expressions.
 From the repository root, the full separation-logic collection builds with:
 
 ```sh
-opam exec --switch=. -- make sl
+make day2
 ```

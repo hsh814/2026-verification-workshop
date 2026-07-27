@@ -89,21 +89,13 @@ Module PureOptProof. Section PureOptProof.
       [cStartTypedFunSim] exposes the two function bodies.  Unfolding those
       bodies leaves two matching returns and the obligation to restore
       [True]. *)
-  Example exercise_simF_fold_constants :
-    ISim.sim_fun open Source Target Ist (fid PureOptHdr.fold_constants).
-  Proof using.
-    cStartTypedFunSim u.
-    unfold PureOptSource.fold_constants, PureOptTarget.fold_constants.
-    (** STOP 1: match the two returns and restore [Ist]. *)
-  Abort.
-
   Lemma simF_fold_constants :
     ISim.sim_fun open Source Target Ist (fid PureOptHdr.fold_constants).
   Proof using.
     cStartTypedFunSim u.
     unfold PureOptSource.fold_constants, PureOptTarget.fold_constants.
-    cStep. iSplit; eauto.
-  Qed.
+    (** STOP 1: match the two returns and restore [Ist]. *)
+  Admitted.
 
   Lemma sim : ISim.t open Source Target emp%I Ist.
   Proof using.
@@ -201,7 +193,7 @@ Module StateOptProof. Section StateOptProof.
 
       Opening [IST] yields the old cell value.  Both stores establish the
       input [x] as the new relation witness. *)
-  Example exercise_simF_store_load :
+  Lemma simF_store_load :
     ISim.sim_fun open Source Target Ist (fid StateOptHdr.store_load).
   Proof using.
     cStartTypedFunSim x.
@@ -209,18 +201,7 @@ Module StateOptProof. Section StateOptProof.
     iDestruct "IST" as (old) "%". destruct H as [-> ->].
     cStepsS. cStepsT.
     (** STOP 2: match the returns and establish [Ist] with witness [x]. *)
-  Abort.
-
-  Lemma simF_store_load :
-    ISim.sim_fun open Source Target Ist (fid StateOptHdr.store_load).
-  Proof using.
-    cStartTypedFunSim x.
-    unfold StateOptSource.store_load, StateOptTarget.store_load.
-    iDestruct "IST" as (old) "%". destruct H as [-> ->].
-    cStepsS. cStepsT. cStep.
-    iSplit; [eauto |].
-    iExists x. done.
-  Qed.
+  Admitted.
 
   Lemma sim : ISim.t open Source Target emp%I Ist.
   Proof using.

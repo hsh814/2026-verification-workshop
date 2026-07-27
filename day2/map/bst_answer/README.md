@@ -46,6 +46,5 @@ classical/description principles, and itree bisimulation equality).
 From the workshop root, a focused final check is:
 
 ```sh
-make COQC=_opam/bin/coqc \
-  separation-logic-examples/map/bst_answer/MapIAproof.vo
+make day2/map/bst_answer/MapIAproof.vo
 ```

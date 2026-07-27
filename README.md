@@ -4,6 +4,8 @@ Workshop materials for Rocq and CRIS.
 
 ## Workshop content
 
+### Day 1: behaviors and contextual refinement
+
 Day 1 follows one continuous question: how does a modular implementation
 produce only behaviors permitted by its specification?
 
@@ -11,23 +13,26 @@ Open these files in order:
 
 | Order | File | Question carried through the file |
 |---:|---|---|
-| 1 | `Behavior.v` | What is one observable behavior of a closed interaction tree? |
-| 2 | `ModuleIntro.v` | How do calls, linking, and compilation produce that closed tree? |
-| 3 | `RefinementIntro.v` | When may a target module replace a source module in every context? |
-| 4 | `Optimizations.v` | How does a direct `ISim` proof establish refinement, first without state and then with related cells? |
-| 5 | `KVSortedList.v` | How can an abstract map be refined by a sorted list whose lookup uses `ITree.iter`? |
+| 1 | [`day1/lectures/Behavior.v`](day1/lectures/Behavior.v) | What is one observable behavior of a closed interaction tree? |
+| 2 | [`day1/lectures/ModuleIntro.v`](day1/lectures/ModuleIntro.v) | How do calls, linking, and compilation produce that closed tree? |
+| 3 | [`day1/lectures/RefinementIntro.v`](day1/lectures/RefinementIntro.v) | When may a target module replace a source module in every context? |
+| 4 | [`day1/exercises/Optimizations.v`](day1/exercises/Optimizations.v) | How does a direct `ISim` proof establish refinement, first without state and then with related cells? |
+| 5 | [`day1/exercises/KVSortedList.v`](day1/exercises/KVSortedList.v) | How can an abstract map be refined by a sorted list whose lookup uses `ITree.iter`? |
 
-The first three files are guided lecture demos. The final two contain complete
-reference proofs and six `STOP` exercises. At a `STOP`, replace the following
-`Abort` with a proof and `Qed`. The reference proof immediately below lets the
-class resume the common flow after each exercise.
+The three files under `day1/lectures/` are complete guided demos. The two
+starter files under `day1/exercises/` preserve the canonical theorem names and
+contain exactly six `STOP` blocks closed with `Admitted`, so they compile
+before the exercises are solved. Replace each `Admitted` with a proof and
+`Qed`. The completed counterparts under [`day1/answers/`](day1/answers/)
+contain completed proofs throughout.
 
 The corresponding presentation is
-[`slides/Day1.md`](slides/Day1.md). A generated PDF is provided as
-[`slides/Day1.pdf`](slides/Day1.pdf), with the presenter prompts extracted in
-[`slides/Day1-notes.txt`](slides/Day1-notes.txt).
+[`day1/slides/Day1.md`](day1/slides/Day1.md). A generated PDF is provided as
+[`day1/slides/Day1.pdf`](day1/slides/Day1.pdf), with the presenter prompts
+extracted in
+[`day1/slides/Day1-notes.txt`](day1/slides/Day1-notes.txt).
 
-### Day 1 timing
+#### Day 1 timing
 
 | Block | Time | Material |
 |---|---:|---|
@@ -36,6 +41,37 @@ The corresponding presentation is
 | Hands-on block 1 | 120 minutes | optimization exercises, then the KV representation relation |
 | Break | 30 minutes | |
 | Hands-on block 2 | 90 minutes | KV `put`, iterator induction for `get`, and guided final assembly |
+
+### Day 2: separation logic
+
+Day 2 develops separation-logic specifications and refinement proofs in this
+order:
+
+1. [`day2/mem/`](day2/mem/README.md) specifies a memory module with
+   `ghost_map` and `mono_nat`.
+2. [`day2/stack/`](day2/stack/README.md) verifies a linked-list stack through
+   the memory specification.
+3. [`day2/map/`](day2/map/README.md) verifies linked-list and binary-search-tree
+   maps against one abstract API and includes an open-ended `try/` scaffold.
+4. [`day2/refcell/`](day2/refcell/README.md) introduces fractional ownership
+   and verifies a dynamically checked reference cell.
+
+Paired `_answer` directories contain the completed exercises. Build all Day 2
+starters and answers with `make day2`; `make sl` remains available as an
+alias.
+
+### Day 3: prime clients and safe memory
+
+Day 3 uses the shared Imp language and memory modules in `day3/imp_system/`.
+The [`day3/prime/`](day3/prime/README.md) problem set verifies an IO-facing
+nth-prime client and its linked-list library. Its completed counterpart is
+[`day3/prime_answer/`](day3/prime_answer/README.md). The
+[`day3/prime_safe/`](day3/prime_safe/README.md) variant proves memory safety
+through body-preserving specification layers, with completed proofs in
+[`day3/prime_safe_answer/`](day3/prime_safe_answer/README.md).
+
+Build all Day 3 files with `make day3`; `make prime` remains available as an
+alias.
 
 ## Requirements
 
@@ -94,9 +130,14 @@ cd 2026-verification-workshop
 
 ```sh
 make check
+make day2
+make day3
 ```
 
-A successful setup finishes with exit code 0.
+`make check` builds Day 1, confirms the six starter `Admitted` blocks, and
+verifies the completed lecture and answer proofs. The other two commands build
+every starter and answer file for their respective days. A successful setup
+finishes each command with exit code 0.
 
 ## Editor setup
 
@@ -147,21 +188,25 @@ CRIS source files use Unicode mathematical notation.
 
 ### Editor check
 
-Open [`Behavior.v`](Behavior.v) and process it from the first line to
-the end.
+Open [`day1/lectures/Behavior.v`](day1/lectures/Behavior.v) and process it
+from the first line to the end.
 
 ## Repository layout
 
 | Path | Purpose |
 |---|---|
-| `Behavior.v` | Guided examples of terminating, nondeterministic, and I/O behaviors |
-| `ModuleIntro.v` | Stateless modules, function calls, linking, and compilation |
-| `RefinementIntro.v` | Behavior inclusion, contextual refinement, and the simulation-to-refinement bridge |
-| `Optimizations.v` | Stateless and stateful compiler-optimization refinements |
-| `KVSortedList.v` | Sorted-list implementation versus abstract key-value storage |
-| `slides/Day1.md` | Marp source synchronized with the Rocq file order and `STOP` exercises |
-| `slides/Day1.pdf` | Generated presentation PDF |
-| `slides/Day1-notes.txt` | Presenter prompts extracted from the Marp source |
+| `day1/lectures/` | Complete demos of behaviors, modules, and contextual refinement |
+| `day1/exercises/` | Day 1 optimization and representation-refinement starters with six `STOP` blocks |
+| `day1/answers/` | Completed Day 1 exercise files with the same theorem names |
+| `day1/slides/` | Marp source, generated PDF, and presenter notes for Day 1 |
+| `day2/lib/` | Shared Day 2 proof libraries |
+| `day2/mem{,_answer}/` | Memory exercise and completed counterpart |
+| `day2/stack{,_answer}/` | Linked-list stack exercise and completed counterpart |
+| `day2/map/` | Linked-list, BST, and open-ended map exercises |
+| `day2/refcell/` | Fractional-memory and reference-cell exercises |
+| `day3/imp_system/` | Shared Imp language, memory, and safe-memory modules |
+| `day3/prime{,_answer}/` | Nth-prime client exercise and completed counterpart |
+| `day3/prime_safe{,_answer}/` | Body-preserving memory-safety exercise and completed counterpart |
 
 ## Troubleshooting
 
@@ -179,6 +224,8 @@ Reinstall CRIS and rebuild the workshop after a load-path or `.vo` error:
 opam reinstall --jobs=N rocq-cris
 make clean
 make check
+make day2
+make day3
 ```
 
 The [VsRocq FAQ](https://github.com/rocq-prover/vsrocq/blob/main/docs/FAQ.md),

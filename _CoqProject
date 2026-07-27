@@ -7,11 +7,14 @@
 -arg -w -arg -cannot-define-projection
 -arg -require-import -arg ExtLib.Structures.Monad
 -arg -exclude-dir -arg imp_system
--Q prime-examples ""
--Q prime-examples/imp_system CRIS.imp_system
--Q separation-logic-examples ""
-Behavior.v
-ModuleIntro.v
-RefinementIntro.v
-Optimizations.v
-KVSortedList.v
+-Q day1 ""
+-Q day2 ""
+-Q day3 ""
+-Q day3/imp_system CRIS.imp_system
+day1/lectures/Behavior.v
+day1/lectures/ModuleIntro.v
+day1/lectures/RefinementIntro.v
+day1/exercises/Optimizations.v
+day1/exercises/KVSortedList.v
+day1/answers/Optimizations.v
+day1/answers/KVSortedList.v

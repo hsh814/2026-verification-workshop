@@ -60,7 +60,7 @@ implementation.
 From the repository root, build all starter and answer files with:
 
 ```sh
-opam exec --switch=. -- make sl
+make day2
 ```
 
 The completed version is in `../stack_answer/`; it imports `../mem_answer/`

@@ -8,6 +8,7 @@
 .nia.cache
 .prime-deps.mk
 .sl-deps.mk
+/build/
 
 .envrc
 .DS_Store
