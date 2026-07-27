@@ -4,12 +4,12 @@ Action: Ask everyone to process one Rocq sentence at a time.
 ---
 
 Prompt: Keep the program fixed and ask whether one proposed trace belongs to its behavior set.
-Action: Process Print Tr.t, Print Beh.t, and Check Beh.of_itree.
+Action: Process Print Beh.t and Check Beh.of_itree.
 
 ---
 
-Prompt: The interaction tree has finished. Its return value appears in the trace.
-Action: Process return_42_terminates. Treat the proof as certification of the example.
+Prompt: The interaction tree has finished. Its return value appears in the trace. Point out the common Any.t value on both sides.
+Action: Process the three Check commands and return_42_terminates. Treat the proof as certification of the example.
 
 ---
 
@@ -29,32 +29,59 @@ Action: Process echo_once_reply_9 and echo_once_may_hang.
 ---
 
 Prompt: Give the class names for finite termination, silent divergence, unanswered I/O, and continuing I/O.
-Action: Process Check Tr.spin. Keep coinduction internals outside today's proof exercises.
+Action: Process Print Tr.t and Check Tr.spin. Keep coinduction internals outside today's proof exercises.
 
 ---
 
-Prompt: We can now observe a closed tree. Real programs arrive as modules with calls and private state.
-Handoff: Open day1/lectures/ModuleIntro.v and ask how those pieces become the tree expected by Beh.of_itree.
+Prompt: We can observe the behavior of a coreE tree. Ask what program structure has already disappeared by the time we reach this type.
+Handoff: Stay in day1/lectures/Behavior.v. The next slide inspects its final Print coreE command.
 
 ---
 
-Prompt: A module carries executable bodies and the state those bodies may access.
-Action: Process the initial Check commands in day1/lectures/ModuleIntro.v.
+Action: Process Print coreE and read the transition comment that follows it.
+Prompt: Point to the absence of Call, SGet, and SPut in Print coreE. Compilation has handled those module-internal effects.
+Prompt: Choose and Take affect the behavior set through branching. External I/O becomes part of a trace.
 
 ---
 
-Prompt: The header gives the boundary a stable name, argument type, and return type.
+Prompt: A behavior describes the whole closed program. Program construction still needs component boundaries and state ownership.
+Prompt: The first boundary supports separate implementation and contextual replacement. The second gives SGet and SPut their state semantics.
+Handoff: crisE is the event signature used while both structures are still present.
+
+---
+
+Prompt: Start from the ordinary module-level program. The service and client can be implemented independently because they share a named boundary.
+Action: Open day1/lectures/ModuleIntro.v, read its opening comment, and continue to ConstHdr.
+
+---
+
+Prompt: Separate Rocq's namespace mechanism from the semantic modules constructed later. The header gives the boundary a stable name, argument type, and return type.
 Action: Process Check ConstHdr.get.
 
 ---
 
-Prompt: Read fnsems as a finite map from the function name to this body.
-Action: Process the ConstModule definitions and fold masks and fsp_none from the spoken explanation.
+Prompt: Relate ordinary return to Ret. Ret is an itree constructor; the body performs no event before returning.
+Action: Process ConstModule through Check get, then pause.
 
 ---
 
-Prompt: ccallU produces a named Call event. Linking will supply its body.
-Action: Process the MainModule definitions.
+Prompt: We encountered crisE in the concrete type of get. Inspect it now. Call names another body; SGet and SPut refer to module-local state.
+Action: Process Print crisE and the three Check commands.
+
+---
+
+Prompt: fnsems registers get under ConstHdr.get. SMod packages the body map, scope, and initial state; SMod.to_mod makes the resulting value linkable.
+Action: Finish the ConstModule definitions.
+
+---
+
+Prompt: The header fixes the call's argument and result types. The caller refers to the service by name; linking will supply its body.
+Action: Process MainModule from Check ccallU through Check t.
+
+---
+
+Prompt: Every node above the star is now a concrete object from ModuleIntro.v. The star combines both function maps and initial states.
+Handoff: Define the linked program represented by the bottom node.
 
 ---
 
@@ -63,73 +90,249 @@ Action: Process LinkedProgram from top to bottom.
 
 ---
 
-Prompt: Preview these operations. The current ConstModule uses an empty state, so the first refinement example can ignore them.
+Prompt: Recap the concrete definitions just processed. Mod.to_lmod translates each crisE body to lmodE; named calls remain. LMod.compile resolves those calls and interprets linked state.
+Handoff: The linked program contains a client module and a service module. Ask whether the same team must own both.
 
 ---
 
-Prompt: We have constructed and observed one implementation. Replacement asks for a comparison that survives future clients.
+Prompt: We just linked MainModule and ConstModule. Ordinary projects often assign the client and library to different teams.
+Prompt: Name each responsibility before introducing any refinement terminology.
+Action: Read the final transition comment in ModuleIntro.v one paragraph at a time across the next five slides.
+
+---
+
+Prompt: Read the API types first, then the contract in ordinary language. The logical cell is the abstract state described by the contract.
+Prompt: The code below the divider is one implementation of that contract. Its field current belongs to the provider.
+Prompt: CellSpec and CellImpl are conceptual names in this motivation; the workshop has not defined Rocq identifiers with those names.
+
+---
+
+Prompt: Derive the output property using only the public contract. The proof never opens the private field current.
+Prompt: This is the proof the application team wants to retain across library releases.
+
+---
+
+Prompt: Read release 2 as a small implementation optimization. Future releases may also change the algorithm, cache, or state representation.
+Prompt: The provider now owes a proof that each release respects the published contract.
+Handoff: Ask for the theorem that validates a release for present and future clients.
+
+---
+
+Prompt: Follow the dependency from bottom to top. The client proof remains valid when every behavior of the new implementation is already covered by CellSpec.
+Prompt: A context can call set and get in arbitrary ways and observe their results. The provider theorem must therefore cover every compatible context.
+Handoff: Express “no extra observable behavior in any context” as behavior inclusion.
+
+---
+
+Prompt: CellSpec packages the public contract as a module. CellImpl is the provider's deployed code. Ctx contains a client and any supporting modules.
+Prompt: The displayed inclusion is the schematic behavioral reading. RefinementIntro.v will state the exact ctx_refines proposition, demonstrate replacement inside a linked module, and then follow adequacy down to refines_lmod.
+Prompt: This is the substitutability reading of contextual refinement. One provider theorem covers every compatible present or future client.
+Prompt: Fix the direction with the concrete names: CellSpec permits behaviors; CellImpl stays inside that set after linking with every compatible context.
 Handoff: Open day1/lectures/RefinementIntro.v.
 
 ---
 
-Prompt: Read the inclusion from a target trace toward a source trace.
-Action: Process Check refines_lmod.
+Prompt: Keep the concrete Cell names from the previous slide. This is the exact proposition corresponding to the all-client theorem stated in ordinary language.
+Prompt: RefinementIntro.v leaves all four modules abstract. We study the theorem's statement and how a client proof uses it.
+Action: Open RefinementIntro.v and process through the first Check.
 
 ---
 
-Prompt: Compilation puts both sides back at the behavior interface from the first file.
-Action: Process refinement_means_behavior_inclusion one line at a time.
+Prompt: CELL_REF contains the promised “for every context.” iSpecialize chooses this Client. Read the resulting refines statement before processing the three proof commands.
+Action: Process cell_in_one_context.
 
 ---
 
-Prompt: The quantified context can contain any compatible caller and supporting modules.
-Action: Point out that the theorem supports later clients without reopening this proof.
+Prompt: ClientSpec can state that the application outputs 42, without exposing the Client implementation. CellSpec remains the unchanged library contract on both sides.
 
 ---
 
-Prompt: Ask the class to read each line aloud. The simulation judgment lists the reference side first; the conclusion lists the replacing target first.
+Prompt: This conclusion remains contextual: another module may still be linked later. Point to the single component that changes and the Client component that remains available.
+Handoff: Show the corresponding replacement lemma.
 
 ---
 
-Prompt: Context enumeration is the specification. Simulation is the reusable proof method.
-Handoff: Process the three Check commands for ISim.sim_fun, ISim.t, and main_adequacy.
+Prompt: Treat the script as a completed proof. Keep attention on the theorem statement: the Cell component changes and Client remains linked.
 
 ---
 
-Prompt: ISim carries a relation Ist between source and target module states. Adequacy returns to the replacement theorem.
-Action: Process simulation_is_enough.
+Prompt: Read the two team proofs as adjacent refinement edges. ctxr_trans composes them. The empty context turns either open edge into a concrete refines assertion.
+Action: Process deploy_client_abstraction, then Print ctx_refines.
 
 ---
 
-Prompt: day1/lectures/RefinementIntro.v supplied the proof ladder. day1/exercises/Optimizations.v instantiates every rung.
+Prompt: Keep Mt and Ms concrete throughout. refines_adequacy closes their module-local resources. The resulting refines_lmod unfolds directly to compiled-program behavior inclusion.
+Action: Process Check Beh, Print refines, Check refines_adequacy, Check refines_lmod, and Print refines_lmod.
+
+---
+
+Prompt: The composed theorem has reached its semantic bottom layer. Transport one trace from the deployed Cell-plus-Client program to CellSpec-plus-ClientSpec. The same argument applied to the first edge transports it to CellSpec-plus-Client.
+Action: Process refinement_means_behavior_inclusion.
+
+---
+
+Prompt: Return to the Cell client once more. CELL_REF supplies the first arrow; the application team's proof supplies the second.
+Prompt: Universal properties over CRIS behaviors transfer along this inclusion.
+
+---
+
+Prompt: Read the proof as function composition: TARGET_BEHAVIOR, then REFINE, then SOURCE_OK.
+Action: Process refinement_transfers_universal_properties one tactic at a time.
+
+---
+
+Prompt: Separate the semantic goal from its proof technique. Contextual refinement is still the theorem we want.
+Prompt: A single proof must cover future contexts, including contexts that perform I/O, diverge, and call back into the module.
+Handoff: Ask what a direct proof over complete linked behaviors would have to inspect.
+
+---
+
+Prompt: Follow the quantifiers in ctx_refines. A direct proof starts over for each arbitrary context behavior.
+Prompt: The implementation change is usually local: an extra load disappears, a representation changes, or a loop is reorganized.
+Handoff: Keep that local correspondence as an invariant while executions unfold.
+
+---
+
+Prompt: A configuration records the remaining computation and current module-local state.
+Prompt: The target generates the behavior that must be included. Each target move therefore receives a matching source move.
+Prompt: The source may use more internal steps, as in a removed load or an arithmetic simplification.
+
+---
+
+Prompt: Read the cases as the interface of the simulation proof. Silent implementation work may differ; observations and control transfers line up.
+Prompt: The workshop tactics select these cases and leave the relation-restoration obligations as Rocq goals.
+
+---
+
+Prompt: The relation lets us extend a matching source prefix whenever the target execution extends.
+Prompt: main_adequacy links the same context to both sides and turns the open simulation into contextual refinement.
+Action: Process Check ISim.t and simulation_is_enough in RefinementIntro.v.
+
+---
+
+Prompt: Local proof rules can inspect the module bodies. The proof has no body for a context-provided touch function.
+Prompt: At the call boundary the simulation proof must establish enough state information for execution by an arbitrary context and its possible re-entry.
+
+---
+
+Prompt: R is chosen for the pair of programs under proof. It records exactly the state facts needed by future simulation rules.
+Prompt: State equality is one possible relation. Representation-changing refinement usually needs a different relation.
+Handoff: Introduce the CRIS parameter that carries this relation.
+
+---
+
+Prompt: Read Ist as a binary relation on the two module-local state maps. Its result is an Iris proposition because the relation may own logical resources.
+Prompt: Keep the examples schematic here. Concrete definitions first appear with the Rocq programs that use them.
+Action: Process Check (ist_type Σ) in RefinementIntro.v.
+
+---
+
+Prompt: Rely describes the premise at entry or resumption. Guarantee describes the obligation at call or return.
+Prompt: Local source and target steps may temporarily break Ist. The control boundary is where the relation must hold.
+
+---
+
+Prompt: This is the high-level open-call rule. A concrete proof later instantiates it when the two Rocq trees expose matching calls.
+Prompt: The rule quantifies over the shared return and related post-states. It therefore covers arbitrary context execution and re-entry.
+
+---
+
+Prompt: This is the first formal rung. Source occurs before Target in ISim.sim_fun.
+Prompt: Keep tactics out of this slide. The next exercise introduces them while the corresponding Rocq goal is visible.
+Handoff: Combine all exported-function statements into the module-level statement.
+
+---
+
+Prompt: cStartModSim unfolds the ISim.t module obligation. apply reuses each proved ISim.sim_fun theorem.
+Prompt: This is a construction proof: per-function simulations and the initial-state relation are the inputs to the module simulation.
+Handoff: Apply the CRIS soundness and adequacy theorems to this completed sim statement.
+
+---
+
+Prompt: main_adequacy is the soundness theorem from open module simulation to contextual refinement.
+Prompt: ctx_refines supplies refines for any chosen context. refines_adequacy reaches the closed behavior-inclusion relation under its explicit semantic assumptions.
+Action: Process Check ISim.sim_fun, Check ISim.t, simulation_is_enough, and Check refines_adequacy.
+Prompt: Keep the argument orders visible: ISim.t takes Source then Target; ctx_refines and refines_lmod name Target first.
+
+---
+
+Prompt: RefinementIntro.v supplied the three statements. This demo inspects the goal produced at every rung.
 Handoff: Open day1/exercises/Optimizations.v and fold the implementation of cStartTypedFunSim.
 
 ---
 
-Prompt: Identify the function name shared by the two modules. Predict the target/source order of the final ctx_refines theorem.
+Prompt: Identify the common function name and check that both bodies have the declared Z return type.
 
 ---
 
-Prompt: A simulation relation records exactly the information needed by future steps. This example needs no stored information.
+Prompt: Process Definition Ist. Ask what information a later step can recover from this relation: only True.
 
 ---
 
-Prompt: sim_fun is the per-function obligation previewed in day1/lectures/RefinementIntro.v.
-Action: Enter simF_fold_constants.
+Prompt: This is the first statement from the proof ladder. Source appears before Target.
+Action: Enter simF_fold_constants and inspect the goal before running a tactic.
 
 ---
 
-Prompt: cStartTypedFunSim handles the Any.t boundary. The unfolded goal exposes the two typed bodies.
-Action: Stop at Admitted.
+Prompt: Run cStartTypedFunSim u. Locate u, st_src, st_tgt, and "IST" in the actual Rocq goal.
+Prompt: Treat lookup and Any.t decoding as workshop infrastructure; begin the semantic proof at the two bodies.
 
 ---
 
-Prompt: Give 5–8 minutes. Ask students to name the two obligations created by iSplit.
-Resume: Open day1/answers/Optimizations.v and process its simF_fold_constants proof together.
+Prompt: Process the unfold command. Identify the next constructor on each side before choosing a tactic.
 
 ---
 
-Prompt: cStartModSim asks for related initial states and one proof per exported function. main_adequacy closes the ladder from the previous section.
+Prompt: Run cStep and stop. cStep consumes the matching Ret constructors. Point to the pure equality and the restored state relation.
+
+---
+
+Prompt: Continue from the goal produced by cStep. Run iSplit as a separate sentence so everyone sees both subgoals. Finish each with eauto.
+Prompt: iSplit follows the Iris separating conjunction. The arithmetic equality computes to reflexivity; Ist unfolds to True.
+
+---
+
+Prompt: Ask what an external observer can see before discussing tactics. Both programs issue the same request with the same argument. The arithmetic simplification happens after the reply.
+Action: Process the read_simplify definitions and enter simF_read_simplify.
+
+---
+
+Prompt: Run cStep as reply and locate reply : Z in the Rocq context. The simulation rule quantifies over every response because the program cannot choose the input.
+Prompt: The second cStep matches the returns. The remaining equality and Ist=True obligations use the same iSplit pattern as constant folding.
+
+---
+
+Prompt: State the semantic reason for induction. The input determines how many source steps occur, so a fixed sequence of cStepS commands covers only one concrete input.
+Action: Enter simF_countdown after processing its source and target definitions.
+
+---
+
+Prompt: These equations concern the whole iterator. The body returns inr O at zero and inl n at a successor; ITree.iter turns the latter into Tau followed by the recursive iterator.
+Prompt: Connect the Rocq induction cases to the equations. The base case reaches a return. The successor case exposes one silent source step and the smaller cursor n.
+
+---
+
+Prompt: Give 15–20 minutes. The comments name every new tactic. Ask which program fragment becomes smaller and why IH needs the current IST.
+Resume: Process the two answer branches. Emphasize that countdown termination supplies structural induction; a potentially infinite loop requires coinductive reasoning.
+
+---
+
+Prompt: Enter sim and run cStartModSim. A module simulation covers every exported source function. The trivial initial relation is discharged during setup; the larger function map also exposes a well-formedness goal.
+
+---
+
+Prompt: mod_tac proves that every function-map entry is present. Each following bullet registers the function simulation proved above.
+
+---
+
+Prompt: Apply main_adequacy first and state the remaining goal aloud: ISim.t open Source Target emp Ist. The lemma sim supplies it.
+Prompt: Close by reading the conclusion semantically: every context-linked Target behavior is permitted by the corresponding Source.
+
+---
+
+Prompt: Re-establish the global destination before introducing state. The exercises construct sim; main_adequacy converts it to contextual refinement.
+Prompt: Source precedes Target in ISim.t. Target precedes Source in ctx_refines.
+Handoff: The next example changes Ist while preserving this proof ladder.
 
 ---
 
@@ -137,21 +340,55 @@ Prompt: The target forwards x to the return. Ask what information connects the t
 
 ---
 
-Prompt: The existential witness records the shared logical value. It can change after a store.
+Prompt: Return to the diagram's sentence “both cells contain a.” The existential witness records that shared logical value inside Rocq and can change after a store or callback.
 
 ---
 
-Prompt: A simulation relation is an invariant over paired states. Intermediate pairs may fall outside it; the proof restores it at the synchronization point.
+Prompt: Derive each tactic from the outer connective. This table supplies the proof-mode vocabulary used in STOP 2 and the KV proof.
+
+---
+
+Prompt: This is store_load, the function called by the concrete re-entrant context. Its simulation is one reason re-entry can restore the callback relation.
+Prompt: Intermediate pairs may fall outside Ist; the proof restores it at the synchronization point.
 Action: In day1/exercises/Optimizations.v, enter simF_store_load and stop at Admitted.
 
 ---
 
-Prompt: Give 15–20 minutes. Ask which value should witness the new existential.
-Resume: Open day1/answers/Optimizations.v and process the function proof, module proof, and adequacy line.
+Prompt: Give 10–15 minutes. Ask which value should witness the new existential, then map the existential goal to iExists.
+Resume: Open day1/answers/Optimizations.v and process the per-function simulation, module-level simulation, and adequacy line.
 
 ---
 
-Prompt: The previous relation connected equal representations. Representation refinement keeps observations aligned across different state types.
+Prompt: Recall the concrete trace with x = 5 and after = 7, then return to the general diagram where after is arbitrary.
+Prompt: Ask whether the proof may remember x after the callback. In each paired execution, a re-entrant context can update that run's cell through the public API. The proof uses the post-call relation.
+Action: Enter simF_callback_read and process through the iAssert.
+
+---
+
+Prompt: Match this code to the “before touch: guarantee Ist(x)” node in the earlier STS.
+Prompt: cCall consumes the pre-call guarantee and matches the same unknown call on both sides.
+Action: Process through cCall and inspect the newly introduced values and IST.
+
+---
+
+Prompt: Match these values to the “after touch: rely on Ist(after)” node. Open IST with witness after, read both cells, and finish with equal results plus the restored relation.
+Action: Process the rest of simF_callback_read. Treat Any.downcast as typed-call infrastructure.
+
+---
+
+Prompt: This is the touch pseudocode used in the earlier concrete trace. The value after is 7 here; the general theorem covers every compatible context.
+Action: Process ReenteringContext.touch.
+
+---
+
+Prompt: The function simulation already established the all-context theorem. This proof performs one universal instantiation.
+Action: Process reentering_context_example one command at a time.
+Handoff: The next example strengthens Ist from equal cells to two different data representations.
+
+---
+
+Prompt: State the new proof task directly. The source exposes an abstract key-value state; the target implements it with a sorted mathematical list.
+Prompt: This is the first exercise where Ist is a representation relation.
 Handoff: Open day1/exercises/KVSortedList.v and inspect the public header first.
 
 ---
@@ -173,21 +410,30 @@ Prompt: Ask students to state this relation before processing its definition. Th
 
 ---
 
-Prompt: Treat the first two as the supplied sequential data-structure library. The simulation uses their combined state_rel_put result.
+Prompt: These are the supplied sequential data-structure lemmas. Their proofs are marked as provided in the file. The exercise combines them into state_rel_put.
 
 ---
 
-Prompt: Use 15–20 minutes. Keep the focus on choosing the two conjuncts and applying supplied algebra.
+Prompt: The first goal is sortedness of the empty list. The second is pointwise agreement between two functions that both return None.
+
+---
+
+Prompt: Use 15–20 minutes across STOP 3 and STOP 4. Match each visible goal with one supplied lemma or one elementary list/function fact.
 Resume: Open day1/answers/KVSortedList.v and process state_rel_empty and state_rel_put.
 
 ---
 
-Prompt: Connect this diagram directly to the equal-cell timeline from day1/exercises/Optimizations.v.
-Action: In day1/exercises/KVSortedList.v, keep the standard Ist wrapper folded. Enter simF_put and process the supplied setup.
+Prompt: IstSB selects module-owned state. IstEq says that the remaining context-owned state st is shared. Function exercises use the helper statement as an interface.
+Action: Process IstLocal, Ist, and Ist_from_state_rel. Fold the helper proof after checking its statement.
 
 ---
 
-Prompt: Give 15–20 minutes. Ask students to identify the representation witnesses before writing tactics.
+Prompt: Connect this diagram directly to the equal-cell timeline from day1/exercises/Optimizations.v.
+Action: In day1/exercises/KVSortedList.v, enter simF_put and process the provided setup. Identify k, v, m, xs, Hrel, and the shared context state st_tgtR.
+
+---
+
+Prompt: Give 10 minutes. Ask which helper conclusion matches the visible Ist goal and which pure fact supplies its premise.
 Resume: Open day1/answers/KVSortedList.v and process its simF_put proof.
 Handoff: Put restores the relation with supplied algebra. Get follows the iterator's control flow, so its proof follows the cursor by induction.
 
@@ -202,8 +448,13 @@ Prompt: Lt and Eq terminate. Gt exposes the next cursor after an internal iterat
 
 ---
 
-Prompt: Generalization gives the source lookup and target iterator the same cursor. The program structure then supplies the induction structure.
-Action: In day1/exercises/KVSortedList.v, enter simF_get and stop at Admitted.
+Prompt: Show the goal before and after generalize. Occurrence selection avoids changing the saved Hstate. The new cursor is exactly the target program's remaining suffix.
+Action: Process through iIntros cursor, then run iInduction and inspect both goals.
+
+---
+
+Prompt: Connect aUnfoldT to the target iterator and cStepT to its Tau continuation. The terminating branches reuse the same helper as STOP 5.
+Action: In day1/exercises/KVSortedList.v, process the supplied prefix of simF_get and stop at Admitted.
 
 ---
 
@@ -217,5 +468,9 @@ Action: Process sim and ctxr as an instructor-led closing proof.
 
 ---
 
+Prompt: Offer this exercise to early finishers. The suffix decreases in the induction, while the prefix records the processed cells. The invariant says that finishing the remaining insertion reconstructs the same pure list_put result.
+
+---
+
 Prompt: Trace the whole chain aloud: behavior, module, refinement, simulation, state relation, iterator induction, contextual refinement.
-Close: Ask each student which relation witness changed in STOP 2 and STOP 5.
+Close: Ask which cursor decreases in STOP 1 and STOP 6, and which relation witness changes in STOP 2 and STOP 5.

@@ -48,10 +48,10 @@ Module KVSource. Section KVSource.
 
   Definition fnsems : fnsemmap :=
     {[fid KVHdr.get #
-        (msk_real (msk_scp scopes msk_true),
+        (msk_scp scopes msk_true,
           (fsp_none, cfunU KVHdr.get get));
       fid KVHdr.put #
-        (msk_real (msk_scp scopes msk_true),
+        (msk_scp scopes msk_true,
           (fsp_none, cfunU KVHdr.put put))]}.
 
   Program Definition smod : SMod.t := {|
@@ -130,10 +130,10 @@ Module SortedListTarget. Section SortedListTarget.
 
   Definition fnsems : fnsemmap :=
     {[fid KVHdr.get #
-        (msk_real (msk_scp scopes msk_true),
+        (msk_scp scopes msk_true,
           (fsp_none, cfunU KVHdr.get get));
       fid KVHdr.put #
-        (msk_real (msk_scp scopes msk_true),
+        (msk_scp scopes msk_true,
           (fsp_none, cfunU KVHdr.put put))]}.
 
   Program Definition smod : SMod.t := {|
@@ -155,11 +155,11 @@ Module KVSortedListProof.
   Definition state_rel (m : amap) (xs : entries) : Prop :=
     sorted_keys xs /\ forall k, m k = list_get k xs.
 
-  (** Provided algebra.
+  (** BEGIN PROVIDED LIST ALGEBRA.
 
-      These pure lemmas establish that [list_put] preserves the representation
-      relation.  [state_rel_put] packages the facts needed by the function
-      simulation below. *)
+      These pure lemmas establish ordinary properties of sorted lists.
+      [state_rel_put] later packages the facts needed by the function
+      simulation.  Their proofs are supplied as library material. *)
   Lemma Forall_list_put_lower lo k v xs :
     (lo < k)%Z ->
     Forall (fun kv => (lo < fst kv)%Z) xs ->
@@ -229,18 +229,24 @@ Module KVSortedListProof.
           destruct (Z.eq_dec q k) as [Heq|Hne]; [lia | reflexivity].
         * exact IH.
   Qed.
+  (** END PROVIDED LIST ALGEBRA. *)
 
   Lemma state_rel_empty : state_rel empty_map [].
   Proof.
-    (** STOP 3: unfold the relation and prove its two conjuncts. *)
+    unfold state_rel. split.
+    (** STOP 3: the two visible goals are empty-list sortedness and pointwise
+        lookup agreement. *)
   Admitted.
 
   Lemma state_rel_put m xs k v :
     state_rel m xs -> state_rel (map_put m k v) (list_put k v xs).
   Proof.
-    intros Hrel.
-    (** STOP 4: use [sorted_keys_put], [list_get_put], and the two
-        conjuncts of [Hrel]. *)
+    intros [Hsorted Hlookup]. split.
+    (** STOP 4:
+
+        - Prove sortedness with [sorted_keys_put] and [Hsorted].
+        - For lookup agreement, introduce an arbitrary query [q], rewrite with
+          [list_get_put], unfold [map_put], and split on [Z.eq_dec q k]. *)
   Admitted.
 
   Section Refinement.
@@ -260,58 +266,76 @@ Module KVSortedListProof.
       IstProd (IstSB Source.(Mod.scopes) IstLocal) IstEq.
 
     (** [IstLocal] carries the representation relation.  [Ist] adds CRIS's
-        standard sandbox and untouched-state bookkeeping.
+        standard state decomposition:
 
-        The helper tactics expose typed arguments and the related map/list
-        pair, then package a proved [state_rel] back into [Ist]. *)
-    Ltac cStartKVPutSim k v :=
-      cStartFunSim;
-      unfold KVSource.put, SortedListTarget.put;
-      cStepsS;
-      lazymatch goal with
-      | arg : Any.t |- _ =>
-          destruct (Any.downcast arg) as [[k v]|] eqn:Harg;
-            cStepsS; [|done]
-      end;
-      cStepsT;
-      iDestruct "IST" as (? ? ? ?) "%"; des; cSimpl.
+        - [IstSB] applies [IstLocal] to state owned by [Source]'s scopes;
+        - [IstEq] requires the remaining context-owned state to be equal;
+        - [IstProd] combines those two state regions.
 
-    Ltac cStartKVGetSim k :=
-      cStartFunSim;
-      unfold KVSource.get, SortedListTarget.get;
-      cStepsS;
-      lazymatch goal with
-      | arg : Any.t |- _ =>
-          destruct (Any.downcast arg) as [k|] eqn:Harg;
-            cStepsS; [|done]
-      end;
-      cStepsT;
-      iDestruct "IST" as (? ? ? ?) "%"; des; cSimpl.
+        The setup below exposes the typed arguments and the related map/list
+        pair directly.  The exercise then restores [Ist] from a proved
+        [state_rel]. *)
 
-    Ltac cRestoreKVIst Hstate :=
-      unfold Ist, IstProd, IstSB, IstLocal, IstEq;
-      destruct Hstate;
-      iPureIntro;
-      repeat (esplits; eauto);
-      split; assumption.
-
-    Ltac cFinishKVReturn Hstate :=
-      cStep;
-      iSplit; [eauto |];
-      cRestoreKVIst Hstate.
+    (** This provided lemma packages the mathematical representation relation
+        into CRIS's full state relation.  The shared [st] is context-owned
+        state that stays equal on both sides. *)
+    Lemma Ist_from_state_rel m xs st :
+      ⌜state_rel m xs⌝ ⊢ Ist
+        (union_with uwnd {[KVSource.v_map # m↑]} st)
+        (union_with uwnd {[SortedListTarget.v_entries # xs↑]} st).
+    Proof.
+      iIntros "%Hrel".
+      unfold Ist, IstProd, IstSB, IstLocal, IstEq.
+      iExists
+        {[KVSource.v_map # m↑]},
+        {[SortedListTarget.v_entries # xs↑]}, st, st.
+      iSplit; [iPureIntro; split; ss |].
+      iSplit.
+      - iSplit; [iPureIntro; split; set_solver |].
+        iExists m, xs. iPureIntro.
+        destruct Hrel as [Hsorted Hlookup].
+        repeat split; try reflexivity; assumption.
+      - iPureIntro. reflexivity.
+    Qed.
 
     (** Proof outline for [put].
 
         Both modules update local state.  [state_rel_put] relates the updated
-        map and list, and [cFinishKVReturn] restores [Ist]. *)
+        map and list.  The final proof-mode steps restore [Ist]. *)
     Lemma simF_put :
       ISim.sim_fun open Source Target Ist (fid KVHdr.put).
     Proof.
-      cStartKVPutSim k v.
-      rename x into m. rename x0 into xs. rename H4 into Hrel.
+      (** BEGIN PROVIDED FUNCTION SETUP. *)
+      cStartFunSim.
+      unfold KVSource.put, SortedListTarget.put.
+      cStepsS.
+      lazymatch goal with
+      | arg : Any.t |- _ =>
+          destruct (Any.downcast arg) as [[k v]|] eqn:Harg;
+            cStepsS; [|done]
+      end.
+      cStepsT.
+      iDestruct "IST" as
+        (st_srcL st_tgtL st_srcR st_tgtR) "%Hparts".
+      destruct Hparts as
+        [[Hsrc Htgt]
+         [[[Hscope_src Hscope_tgt]
+           [m [xs [HsrcL [HtgtL Hrel]]]]]
+          Hright]].
+      subst st_src st_tgt st_srcL st_tgtL st_srcR.
       cStepsS. cStepsT.
-      (** STOP 5: obtain [Hupdated] with [state_rel_put], then finish the
-          matching returns with [cFinishKVReturn Hupdated]. *)
+      (** END PROVIDED FUNCTION SETUP.
+
+          The domain-specific context is now [k], [v], [m], [xs], and
+          [Hrel : state_rel m xs]. *)
+      pose proof (state_rel_put m xs k v Hrel) as Hupdated.
+      cStep.
+      iSplit; [eauto |].
+      (** STOP 5:
+
+          Apply [Ist_from_state_rel] with the shared state [st_tgtR], then
+          supply the pure fact [Hupdated].  The helper keeps CRIS packaging
+          separate from the representation argument. *)
     Admitted.
 
     (** Proof outline for [get].
@@ -323,15 +347,43 @@ Module KVSortedListProof.
     Lemma simF_get :
       ISim.sim_fun open Source Target Ist (fid KVHdr.get).
     Proof.
-      cStartKVGetSim k.
-      rename x into m. rename x0 into xs. rename H4 into Hrel.
+      (** BEGIN PROVIDED FUNCTION SETUP. *)
+      cStartFunSim.
+      unfold KVSource.get, SortedListTarget.get.
+      cStepsS.
+      lazymatch goal with
+      | arg : Any.t |- _ =>
+          destruct (Any.downcast arg) as [k|] eqn:Harg;
+            cStepsS; [|done]
+      end.
+      cStepsT.
+      iDestruct "IST" as
+        (st_srcL st_tgtL st_srcR st_tgtR) "%Hparts".
+      destruct Hparts as
+        [[Hsrc Htgt]
+         [[[Hscope_src Hscope_tgt]
+           [m [xs [HsrcL [HtgtL Hrel]]]]]
+          Hright]].
+      subst st_src st_tgt st_srcL st_tgtL st_srcR.
       cStepsS. cStepsT.
+      (** END PROVIDED FUNCTION SETUP.
+
+          The domain-specific context is now [k], [m], [xs], and
+          [Hrel : state_rel m xs]. *)
       pose proof Hrel as Hstate.
       destruct Hrel as [_ Hlookup]. rewrite Hlookup.
+      (** Occurrences 1 and 3 are the source lookup and target iterator cursor.
+          Generalizing both makes the remaining list suffix the induction
+          variable. *)
       generalize xs at 1 3. iIntros (cursor).
-      (** STOP 6: use [iInduction cursor].  [cFinishKVReturn Hstate]
-          closes each terminating case; the [Gt] case takes one target step
-          and applies the induction hypothesis. *)
+      iInduction cursor as [|[k' v'] tl] "IH"; aUnfoldT.
+      (** STOP 6:
+
+          - Empty cursor: [cStep], split return/[Ist], then apply
+            [Ist_from_state_rel] to [Hstate].
+          - Nonempty cursor: simplify and destruct [Z.compare k k'].
+            The [Eq] and [Lt] cases use the same return pattern.
+            The [Gt] case uses [cStepT; iApply "IH"] for the shorter tail. *)
     Admitted.
 
     (** Module assembly.

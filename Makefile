@@ -17,12 +17,18 @@ DAY1_LECTURE_SOURCES := \
 	$(DAY1_DIR)/lectures/Behavior.v \
 	$(DAY1_DIR)/lectures/ModuleIntro.v \
 	$(DAY1_DIR)/lectures/RefinementIntro.v
-DAY1_EXERCISE_SOURCES := \
+DAY1_CORE_EXERCISE_SOURCES := \
 	$(DAY1_DIR)/exercises/Optimizations.v \
 	$(DAY1_DIR)/exercises/KVSortedList.v
+DAY1_ADVANCED_EXERCISE_SOURCES := \
+	$(DAY1_DIR)/exercises/KVSortedListAdvanced.v
+DAY1_EXERCISE_SOURCES := \
+	$(DAY1_CORE_EXERCISE_SOURCES) \
+	$(DAY1_ADVANCED_EXERCISE_SOURCES)
 DAY1_ANSWER_SOURCES := \
 	$(DAY1_DIR)/answers/Optimizations.v \
-	$(DAY1_DIR)/answers/KVSortedList.v
+	$(DAY1_DIR)/answers/KVSortedList.v \
+	$(DAY1_DIR)/answers/KVSortedListAdvanced.v
 DAY1_COMPLETE_SOURCES := $(DAY1_LECTURE_SOURCES) $(DAY1_ANSWER_SOURCES)
 SOURCES := \
 	$(DAY1_LECTURE_SOURCES) \
@@ -86,9 +92,15 @@ check-day1-exercises:
 		exit 1; \
 	fi
 	@count=$$(grep -hE '^[[:space:]]*Admitted[[:space:]]*\.' \
-		$(DAY1_EXERCISE_SOURCES) | wc -l); \
-	if [ "$$count" -ne 6 ]; then \
-		echo "Expected 6 admitted Day 1 exercises, found $$count" >&2; \
+		$(DAY1_CORE_EXERCISE_SOURCES) | wc -l); \
+	if [ "$$count" -ne 7 ]; then \
+		echo "Expected 7 admitted core Day 1 exercises, found $$count" >&2; \
+		exit 1; \
+	fi
+	@count=$$(grep -hE '^[[:space:]]*Admitted[[:space:]]*\.' \
+		$(DAY1_ADVANCED_EXERCISE_SOURCES) | wc -l); \
+	if [ "$$count" -ne 1 ]; then \
+		echo "Expected 1 admitted advanced Day 1 exercise, found $$count" >&2; \
 		exit 1; \
 	fi
 
@@ -109,6 +121,9 @@ check-sl-answers:
 $(OBJECTS): %.vo: %.v Makefile
 	@echo "COQC $<"
 	@$(COQC) $(DAY1_COQFLAGS) $<
+
+day1/exercises/KVSortedListAdvanced.vo: day1/exercises/KVSortedList.vo
+day1/answers/KVSortedListAdvanced.vo: day1/answers/KVSortedList.vo
 
 $(PRIME_OBJECTS): %.vo: %.v Makefile
 	@echo "COQC $<"

@@ -59,17 +59,16 @@ Section PrimeSafeAux.
     rewrite /mod_src /mod_top /sp /smod_src.
     iApply refines_trans. iSplitR "CANCEL".
     { iApply ctxr_refines. iApply Cancel.prepare; et; clarify. }
-    iApply (Cancel.cancel_legacy smod_src emp%I).
+    iApply Cancel.cancel.
     { repeat apply SMod.cancellable_add; r; mod_tac ss. }
     { assert (Ht : (SMod.sp_from smod_src).1 !! entry = fsp_none)
         by mod_tac.
       rewrite Ht; clear Ht.
-      eexists _, _; splits.
-      { ss; exists tt; split; refl. }
-      { iIntros "[? [? ?]]"; ss. }
-      { unfoldPrePost. iIntros "% % $ //". }
+      ss; exists tt; split; refl.
     }
-    iFrame "CANCEL".
+    { unfoldPrePost. iIntros "% % $ //". }
+    iDestruct "CANCEL" as "(X & Y & Z & $ & $)".
+    unfoldPrePost; done.
   Qed.
 
   (** Compose the body-preserving layers in this order:

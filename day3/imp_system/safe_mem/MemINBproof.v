@@ -2,7 +2,7 @@ From CRIS.common Require Import CRIS.
 From CRIS.imp_system.mem Require Import MemHeader MemI MemA MemIAproof.
 From CRIS.imp_system.safe_mem Require Import MemNB.
 From CRIS.imp_system.imp Require Import ImpPrelude.
-From CRIS.simulations.filter Require Import CallFilter.
+From CRIS.filter Require Import CallFilter.
 From iris.algebra Require Import auth excl agree csum functions dfrac_agree.
 
 Module MemINB. Section MemINB.

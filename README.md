@@ -15,16 +15,18 @@ Open these files in order:
 |---:|---|---|
 | 1 | [`day1/lectures/Behavior.v`](day1/lectures/Behavior.v) | What is one observable behavior of a closed interaction tree? |
 | 2 | [`day1/lectures/ModuleIntro.v`](day1/lectures/ModuleIntro.v) | How do calls, linking, and compilation produce that closed tree? |
-| 3 | [`day1/lectures/RefinementIntro.v`](day1/lectures/RefinementIntro.v) | When may a target module replace a source module in every context? |
-| 4 | [`day1/exercises/Optimizations.v`](day1/exercises/Optimizations.v) | How does a direct `ISim` proof establish refinement, first without state and then with related cells? |
+| 3 | [`day1/lectures/RefinementIntro.v`](day1/lectures/RefinementIntro.v) | How do local simulations establish composable contextual-refinement edges? |
+| 4 | [`day1/exercises/Optimizations.v`](day1/exercises/Optimizations.v) | How does `ISim` match returns, I/O, a terminating iterator, related local states, and a call into unknown context code? |
 | 5 | [`day1/exercises/KVSortedList.v`](day1/exercises/KVSortedList.v) | How can an abstract map be refined by a sorted list whose lookup uses `ITree.iter`? |
+| 6 (optional) | [`day1/exercises/KVSortedListAdvanced.v`](day1/exercises/KVSortedListAdvanced.v) | How can sorted-list insertion traverse with `ITree.iter` while maintaining a cursor invariant? |
 
-The three files under `day1/lectures/` are complete guided demos. The two
+The three files under `day1/lectures/` are complete guided demos. The two core
 starter files under `day1/exercises/` preserve the canonical theorem names and
-contain exactly six `STOP` blocks closed with `Admitted`, so they compile
-before the exercises are solved. Replace each `Admitted` with a proof and
-`Qed`. The completed counterparts under [`day1/answers/`](day1/answers/)
-contain completed proofs throughout.
+contain instructor-guided demonstrations and six `STOP` blocks closed with
+exactly seven uses of `Admitted`, so they compile before the exercises are
+solved. The optional advanced starter adds one `Admitted` proof for iterative
+`put`. Replace each `Admitted` with a proof and `Qed`. The matching files under
+[`day1/answers/`](day1/answers/) contain completed proofs throughout.
 
 The corresponding presentation is
 [`day1/slides/Day1.md`](day1/slides/Day1.md). A generated PDF is provided as
@@ -38,9 +40,9 @@ extracted in
 |---|---:|---|
 | Theory 1 | 60 minutes | Rocq foundations and interaction trees (professor-led) |
 | Theory 2 | 60 minutes | `Behavior.v` through refinement and the first stateless simulation |
-| Hands-on block 1 | 120 minutes | optimization exercises, then the KV representation relation |
+| Hands-on block 1 | 120 minutes | optimization exercises, the unknown-call demonstration, then the KV representation relation |
 | Break | 30 minutes | |
-| Hands-on block 2 | 90 minutes | KV `put`, iterator induction for `get`, and guided final assembly |
+| Hands-on block 2 | 90 minutes | KV `put`, iterator induction for `get`, guided final assembly, and the optional iter-based `put` extension |
 
 ### Day 2: separation logic
 
@@ -100,15 +102,16 @@ Activate the switch again after opening a new terminal:
 eval "$(opam env --switch=cris-workshop --set-switch)"
 ```
 
-### 2. Install CRIS v2026-07-22
+### 2. Install the workshop CRIS snapshot
 
 ```sh
 opam repo add rocq-released https://rocq-prover.org/opam/released
 opam pin add -y --jobs=N rocq-cris \
-  'git+https://github.com/snu-sf/CRIS.git#v2026-07-22'
+  'git+https://github.com/snu-sf/CRIS.git#c0bcd04e7ddfed32f1d7b8e5e2e328e3b5957bdd'
 ```
 
-This installs the [CRIS v2026-07-22 release](https://github.com/snu-sf/CRIS/releases/tag/v2026-07-22),
+This installs the exact
+[CRIS workshop snapshot](https://github.com/snu-sf/CRIS/commit/c0bcd04e7ddfed32f1d7b8e5e2e328e3b5957bdd),
 Rocq 9.0.0, and the exact CRIS dependencies. Check the active installation:
 
 ```sh
@@ -134,10 +137,11 @@ make day2
 make day3
 ```
 
-`make check` builds Day 1, confirms the six starter `Admitted` blocks, and
-verifies the completed lecture and answer proofs. The other two commands build
-every starter and answer file for their respective days. A successful setup
-finishes each command with exit code 0.
+`make check` builds Day 1, confirms the seven intended core starter `Admitted`
+commands and one optional advanced `Admitted`, and verifies the completed
+lecture and answer proofs. The other two commands build every starter and
+answer file for their respective days. A successful setup finishes each
+command with exit code 0.
 
 ## Editor setup
 
@@ -196,8 +200,8 @@ from the first line to the end.
 | Path | Purpose |
 |---|---|
 | `day1/lectures/` | Complete demos of behaviors, modules, and contextual refinement |
-| `day1/exercises/` | Day 1 optimization and representation-refinement starters with six `STOP` blocks |
-| `day1/answers/` | Completed Day 1 exercise files with the same theorem names |
+| `day1/exercises/` | Two core Day 1 starters and an optional iterative-`put` extension |
+| `day1/answers/` | Completed counterparts with the same theorem names |
 | `day1/slides/` | Marp source, generated PDF, and presenter notes for Day 1 |
 | `day2/lib/` | Shared Day 2 proof libraries |
 | `day2/mem{,_answer}/` | Memory exercise and completed counterpart |
