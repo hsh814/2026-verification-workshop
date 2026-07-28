@@ -236,18 +236,22 @@ Module KVSortedListProof.
     unfold state_rel. split.
     (** STOP 3: the two visible goals are empty-list sortedness and pointwise
         lookup agreement. *)
-  Admitted.
+    - constructor.
+    - intros k. simpl. reflexivity.
+  Qed.
 
   Lemma state_rel_put m xs k v :
     state_rel m xs -> state_rel (map_put m k v) (list_put k v xs).
   Proof.
     intros [Hsorted Hlookup]. split.
     (** STOP 4:
-
         - Prove sortedness with [sorted_keys_put] and [Hsorted].
         - For lookup agreement, introduce an arbitrary query [q], rewrite with
           [list_get_put], unfold [map_put], and split on [Z.eq_dec q k]. *)
-  Admitted.
+  - apply sorted_keys_put. exact Hsorted.
+  - intros q. rewrite list_get_put. unfold map_put.
+    destruct (Z.eq_dec q k); [reflexivity | apply Hlookup].
+  Qed.
 
   Section Refinement.
     Context `{!crisG Γ Σ α β τ _S _I}.
@@ -336,7 +340,8 @@ Module KVSortedListProof.
           Apply [Ist_from_state_rel] with the shared state [st_tgtR], then
           supply the pure fact [Hupdated].  The helper keeps CRIS packaging
           separate from the representation argument. *)
-    Admitted.
+      iApply 
+    Qed.
 
     (** Proof outline for [get].
 
