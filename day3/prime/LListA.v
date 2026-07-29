@@ -86,8 +86,8 @@ Module LListA. Section LListA.
       resources. *)
   Definition new_spec : fspec :=
     fspec_simple
-      (fun _ : unit =>
-        ((fun arg => ⌜arg = tt↑⌝ ∗ list_uninit),
+      (fun old_state : llist_state =>
+        ((fun arg => ⌜arg = tt↑⌝ ∗ list_user old_state),
          (fun ret =>
             ∃ list_loc,
               ⌜ret = list_loc↑⌝ ∗ is_list list_loc [])))%I.

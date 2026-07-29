@@ -48,18 +48,20 @@ changing or observing its logical contents.  A generalized design could use
 an authoritative finite map to retain resources for all allocated lists, but
 that extension is not required here.
 
-The two proof layers deliberately start with different resource halves.
-`LListIA` consumes `auth_init`, while `PrimeIA` consumes `frag_init`.  Neither
-source module includes its auxiliary module: `LListIA` inlines target calls to
-`MemA`, and `PrimeIA` inlines target calls to `LListA`.  The final theorem
-frames the authoritative half around the client refinement and uses
+The authoritative and fragment halves follow different proof paths.
+`LListIA` consumes `auth_init`, while `PrimeIA` starts from `emp` with
+`IstEq`.  The fragment instead enters through the specification of the
+program entry, is passed to `get_prime`, and is threaded through the
+linked-list operation specifications.  Cancellation supplies the initial
+`frag_init`; the final theorem allocates both halves with
 `init_cond = frag_init ∗ auth_init`.
 
 The mathematical Rocq function `nth_prime n` remains parameterized by an
 index.  The executable calculator instead has type `get_prime : unit -> nat`:
-it obtains `n` from the observable `IO "input"` event.  Because the input is
-inside the function behavior, its expected behavior is given as an abstract
-ITree rather than an `fspec_simple`.
+it obtains `n` from the observable `IO "input"` event.  Its abstract ITree
+contains the functional behavior, while `get_prime_spec` only transfers the
+list fragment across the call boundary.  The distinguished `entry` calls
+`get_prime` and emits an `IO "print"` event with the result.
 
 ## Files
 
@@ -72,8 +74,10 @@ ITree rather than an `fspec_simple`.
   resource-level function specifications.
 - `LListIAproof.v`: solved function simulations, module simulation, and
   linked-list contextual refinement.
-- `PrimeI.v`: supplied IO-facing prime-calculator ITree.
-- `PrimeA.v`: supplied pure specification ITree:
+- `PrimeI.v`: supplied prime calculator and the executable entry that calls
+  it and prints its result.
+- `PrimeA.v`: the corresponding abstract calculator, resource-transfer
+  specifications, and entry:
 
   ```coq
   fun _ =>
@@ -114,17 +118,18 @@ make day3/prime_answer/PrimeIAproof.vo
    tactics.  Then prove `get` by following the supplied `nodes` predicate and
    inducting over the index.  Preserve the stable list location through both
    operations.  An index past the null pointer returns `None`.
-3. In `PrimeIAproof.v`, keep the ITree proof separate from the number theory.
-   State an outer invariant involving `first_primes_desc`, then an inner
-   invariant for the indexes already checked.  Each `get` preserves the same
-   list resource.  The divisibility loop belongs entirely to `PrimeI`.
+3. In `PrimeIAproof.v`, obtain the list fragment from the source
+   `get_prime_spec`, rather than from the module invariant.  Keep the ITree
+   proof separate from the number theory: state an outer invariant involving
+   `first_primes_desc`, then an inner invariant for the indexes already
+   checked.  Return the final fragment through the source postcondition.
 4. Finish the `get_prime` simulation by relating the concrete result to the
-   abstract `nth_prime` return.  In `PrimeAll.v`, compose
+   abstract `nth_prime` return, then prove `entry` by matching its
+   `get_prime` call with `cCall` and its print event.  In `PrimeAll.v`, compose
    `MemIA`, `LListIA`, and `PrimeIA`, then apply `Cancel.prepare` and
-   `Cancel.cancel` to the remaining `PrimeA` source module.  Use separate
-   specification maps derived from `PrimeA.smod`, `LListA.smod`, and
-   `MemA.smod`; the prime map must exactly match the source module when
-   applying cancellation.
+   `Cancel.cancel`.  Cancellation supplies `frag_init` to the entry
+   precondition and removes the entry and `get_prime` specifications from the
+   executable abstract program.
 
 If you also have the CRIS-examples repository checked out, useful references
 there are:

@@ -88,8 +88,17 @@ Module PrimeI. Section PrimeI.
             else Ret (inl (S candidate, S found)))
         (2, 0).
 
+  Definition main : Any.t -> itree crisE Any.t :=
+    fun _ =>
+      prime <- ccallU PrimeHdr.get_prime tt;;
+      '_ : unit <- trigger (@IO nat unit "print" prime);;
+      Ret tt↑.
+
   Definition fnsems : fnsemmap :=
-    {[fid PrimeHdr.get_prime #
+    {[entry #
+        (msk_scp scopes msk_true,
+          (None, main));
+      fid PrimeHdr.get_prime #
         (msk_scp scopes msk_true,
           (None, cfunU PrimeHdr.get_prime get_prime))]}.
 

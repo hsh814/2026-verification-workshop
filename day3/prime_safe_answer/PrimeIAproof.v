@@ -130,10 +130,34 @@ Module PrimeIA. Section PrimeIA.
     - cStepsS. iDestruct "ASM" as "[-> ->]". cSimpl.
   Qed.
 
+  Lemma simF_main :
+    ISim.sim_fun open PrimeAMod PrimeIMod Ist entry.
+  Proof.
+    cStartFunSim.
+    rewrite /PrimeA.main /PrimeI.main.
+    cStepsS. cStepsT.
+    iDestruct "ASM" as "[-> ->]". cSimpl.
+    cStepsS. cStepsT.
+    rewrite /SModTr.HoareCall. cStepsS.
+    cForceS tt. cForceS (tt↑). cForcesS.
+    iSplit; first done. cStepsS.
+    cCall "IST" as (prime st_src' st_tgt') "IST".
+    cStepsS.
+    iDestruct "ASM" as "(-> & %value & ->)". cSimpl.
+    cStepsS. cStepsT.
+    cStep.
+    cStepsS. cStepsT.
+    cForceS (tt↑). cStepsS. cForceS. cSimpl.
+    iSplitL "".
+    { iSplitL ""; first done. done. }
+    cStep. iSplit; first done. iFrame.
+  Qed.
+
   Lemma sim :
     ISim.t open PrimeAMod PrimeIMod emp%I Ist.
   Proof.
     cStartModSim.
+    - apply simF_main.
     - apply simF_get_prime.
     - iIntros "_". unfold Ist, IstProd, IstLocal.
       do 4 iExists _. ss.

@@ -50,7 +50,8 @@ Section PrimeSafeAux.
       (init_cond ∗ refines mod_src mod_top)%I.
   Proof.
     (* TODO 3(d): apply [Cancel.prepare] and then [Cancel.cancel] to
-       [smod_src].  Its entry carries [PrimeA.get_prime_spec]. *)
+       [smod_src].  Its entry carries [PrimeA.main_spec], so the lookup must
+       be [fsp_some PrimeA.main_spec] rather than [fsp_none]. *)
   Admitted.
 
   (** Compose the body-preserving layers in this order:

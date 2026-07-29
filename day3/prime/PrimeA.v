@@ -1,14 +1,15 @@
 From CRIS.common Require Import CRIS.
-From prime Require Export PrimeHeader PrimeMath.
+From prime Require Export LListA PrimeHeader PrimeMath.
 
 (** Supplied abstract behavior for the IO-facing prime calculator.
 
-    This is specification code rather than an [fspec].  It observes the same
-    input event as the implementation, chooses an abstract return value, and
-    uses the pure [guarantee] event to constrain that value.  No Iris resource
-    is involved in this postcondition. *)
+    [get_prime] is specification code: it observes the same input event as the
+    implementation and returns the corresponding mathematical prime.  Its
+    function specification transfers the linked-list fragment through the
+    call boundary.  The program [main] receives the initial fragment, calls
+    [get_prime], and prints its result. *)
 Module PrimeA. Section PrimeA.
-  Context `{!crisG Γ Σ α β τ _S _I}.
+  Context `{!crisG Γ Σ α β τ _S _I, !llistGS}.
 
   Definition scopes := ["Prime"].
 
@@ -24,10 +25,39 @@ Module PrimeA. Section PrimeA.
       n <- trigger (IO "input" ());;
       Ret (nth_prime n).
 
+  Definition get_prime_spec : fspec :=
+    fspec_simple
+      (fun old_state : llist_state =>
+        ((fun arg =>
+            ⌜arg = tt↑⌝ ∗ LListA.list_user old_state),
+         (fun _ =>
+            ∃ new_state,
+              LListA.list_user new_state)))%I.
+
+  Definition main : Any.t -> itree crisE Any.t :=
+    fun _ =>
+      prime <- ccallU PrimeHdr.get_prime tt;;
+      '_ : unit <- trigger (@IO nat unit "print" prime);;
+      Ret tt↑.
+
+  Definition main_spec : fspec :=
+    fspec_simple
+      (fun _ : unit =>
+        ((fun arg =>
+            ⌜arg = tt↑⌝ ∗ LListA.list_uninit),
+         (fun ret =>
+            ⌜ret = tt↑⌝ ∗
+            ∃ state,
+              LListA.list_user state)))%I.
+
   Definition fnsems : fnsemmap :=
-    {[fid PrimeHdr.get_prime #
+    {[entry #
         (msk_scp scopes msk_true,
-          (None, cfunU PrimeHdr.get_prime get_prime))]}.
+          (fsp_some main_spec, main));
+      fid PrimeHdr.get_prime #
+        (msk_scp scopes msk_true,
+          (fsp_some get_prime_spec,
+            cfunU PrimeHdr.get_prime get_prime))]}.
 
   Program Definition smod : SMod.t := {|
     SMod.scopes := scopes;
@@ -36,11 +66,10 @@ Module PrimeA. Section PrimeA.
   |}.
   Solve All Obligations with mod_tac.
 
-  Definition init_cond : iProp Σ := emp%I.
+  Definition init_cond : iProp Σ := LListA.frag_init.
 
-  (** [PrimeA] is the source module that is cancelled in [PrimeAll].  Using
-      the specification map derived from the source module is the standard
-      pre-cancellation form, even though [PrimeA] itself declares no
-      function specifications. *)
+  (** [PrimeA] is the source module cancelled in [PrimeAll].  Before
+      cancellation, its map interprets both the entry and [get_prime]
+      specifications. *)
   Definition t : Mod.t := SMod.to_mod (SMod.sp_from smod) smod.
 End PrimeA. End PrimeA.

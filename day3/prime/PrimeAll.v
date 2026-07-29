@@ -48,15 +48,15 @@ Section PrimeAux.
     (* TODO 4(a): unfold [sp_list] and prove the finite-map inclusion. *)
   Admitted.
 
-  (** Cancellation removes the specification machinery from the remaining
-      source module.  [Cancel.init_res] is the administrative resource needed
-      by the cancellation theorem. *)
+  (** Cancellation supplies the initial list fragment to [main_spec] and
+      removes the specifications from [entry] and [get_prime]. *)
   Lemma cancel_src :
-    (init_cond ∗ Cancel.init_res)%I ⊢
-      (init_cond ∗ refines mod_src mod_top)%I.
+    (PrimeA.init_cond ∗ Cancel.init_res)%I ⊢
+      refines mod_src mod_top.
   Proof.
     (* TODO 4(b): first apply [Cancel.prepare], then [Cancel.cancel].
-       [PrimeA] is cancellable and its entry has [fsp_none]. *)
+       The entry has [PrimeA.main_spec], whose precondition is discharged by
+       [PrimeA.init_cond]. *)
   Admitted.
 
   (** Compose the implementation refinements in this order:
@@ -66,21 +66,24 @@ Section PrimeAux.
         PrimeI ★ LListA <= PrimeA.
 
       The source sides of [LListIA] and [PrimeIA] contain no auxiliary
-      modules.  Frame the unused resource halves while applying each result,
-      and finish with [LListA.init_cond = frag_init ∗ auth_init]. *)
+      modules.  [PrimeIA] needs no initial resource: reserve the fragment for
+      entry cancellation and give the authoritative half to [LListIA]. *)
   Lemma src_tgt :
-    init_cond ⊢ refines mod_tgt mod_src.
+    (LListA.auth_init ∗ MemA.init_cond [])%I ⊢
+      refines mod_tgt mod_src.
   Proof.
     (* TODO 4(c): instantiate [MemIA.ctxr] with [sp_mem], [LListIA.ctxr]
-       with [sp_list] and [sp_mem], and [PrimeIA.ctxr] with [sp_list]. *)
+       with [sp_list] and [sp_mem], and [PrimeIA.ctxr] with [sp_list].
+       The last refinement consumes [emp]. *)
   Admitted.
 
   Lemma top_tgt :
     (init_cond ∗ Cancel.init_res)%I ⊢ refines mod_tgt mod_top.
   Proof.
-    iIntros "R".
-    iPoseProof (cancel_src with "R") as "[INIT REF2]".
-    iPoseProof (src_tgt with "INIT") as "REF1".
+    rewrite /init_cond /LListA.init_cond.
+    iIntros "[[[FRAG AUTH] MEM] CANCEL]".
+    iPoseProof (cancel_src with "[$FRAG $CANCEL]") as "REF2".
+    iPoseProof (src_tgt with "[$AUTH $MEM]") as "REF1".
     iApply refines_trans. iFrame.
   Qed.
 

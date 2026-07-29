@@ -56,11 +56,20 @@ Module PrimeIA. Section PrimeIA.
        No primality facts or custom resource algebra are required. *)
   Admitted.
 
+  Lemma simF_main :
+    ISim.sim_fun open PrimeAMod PrimeIMod Ist entry.
+  Proof.
+    (* TODO 2(b): expose [PrimeA.main_spec], establish the precondition of
+       the source [get_prime] call, match it with [cCall], and then match the
+       common print event. *)
+  Admitted.
+
   Lemma sim :
     ISim.t open PrimeAMod PrimeIMod emp%I Ist.
   Proof.
-    (* TODO 2(b): use [simF_get_prime].  The [IstProd] structure lets
-       [cStartModSim] handle the shared list and memory functions. *)
+    (* TODO 2(c): use [simF_main] and [simF_get_prime].  The [IstProd]
+       structure lets [cStartModSim] handle the shared list and memory
+       functions. *)
   Admitted.
 End PrimeIA.
 
@@ -76,6 +85,6 @@ Section contextual_refinement.
       (PrimeI.t ★ LListA.t sp ★ MemNB.t sp [])
       (PrimeA.t sp ★ LListA.t sp ★ MemNB.t sp []).
   Proof.
-    (* TODO 2(c): apply [main_adequacy] to [sim]. *)
+    (* TODO 2(d): apply [main_adequacy] to [sim]. *)
   Admitted.
 End contextual_refinement. End PrimeIA.

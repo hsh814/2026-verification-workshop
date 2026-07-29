@@ -48,27 +48,28 @@ Section PrimeAux.
     split; et.
   Qed.
 
-  (** Cancellation removes the specification machinery from the remaining
-      source module.  [Cancel.init_res] is the administrative resource needed
-      by the cancellation theorem. *)
+  (** Cancellation supplies the initial list fragment to [main_spec] and
+      removes the specifications from [entry] and [get_prime]. *)
   Lemma cancel_src :
-    (init_cond ∗ Cancel.init_res)%I ⊢
-      (init_cond ∗ refines mod_src mod_top)%I.
+    (PrimeA.init_cond ∗ Cancel.init_res)%I ⊢
+      refines mod_src mod_top.
   Proof.
-    iIntros "[INIT CANCEL]". iFrame "INIT".
+    iIntros "[FRAG CANCEL]".
     rewrite /mod_src /mod_top /sp_prime /smod_src.
-    iApply refines_trans. iSplitR "CANCEL".
+    iApply refines_trans. iSplitR "FRAG CANCEL".
     { iApply ctxr_refines. iApply Cancel.prepare; et; clarify. }
     iApply Cancel.cancel.
     { r; rewrite /=; mod_tac ss. }
-    { assert (Ht : (SMod.sp_from smod_src).1 !! entry = fsp_none)
+    { assert (Ht : (SMod.sp_from smod_src).1 !! entry =
+          fsp_some PrimeA.main_spec)
         by mod_tac.
       rewrite Ht; clear Ht.
       ss; exists tt; split; refl.
     }
-    { unfoldPrePost. iIntros "% % $ //". }
+    { unfoldPrePost. iIntros "% % H".
+      iDestruct "H" as "(-> & _)". done. }
     iDestruct "CANCEL" as "(X & Y & Z & $ & $)".
-    unfoldPrePost; done.
+    unfoldPrePost. rewrite /PrimeA.init_cond. iFrame. ss.
   Qed.
 
   (** Compose the implementation refinements in this order:
@@ -78,18 +79,18 @@ Section PrimeAux.
         PrimeI ★ LListA <= PrimeA.
 
       The source sides of [LListIA] and [PrimeIA] contain no auxiliary
-      modules.  Frame the unused resource halves while applying each result,
-      and finish with [LListA.init_cond = frag_init ∗ auth_init]. *)
+      modules.  [PrimeIA] now needs no initial resource: the list fragment is
+      reserved for entry cancellation, while [LListIA] consumes the
+      authoritative half. *)
   Lemma src_tgt :
-    init_cond ⊢ refines mod_tgt mod_src.
+    (LListA.auth_init ∗ MemA.init_cond [])%I ⊢
+      refines mod_tgt mod_src.
   Proof.
-    rewrite /init_cond /LListA.init_cond.
-    iIntros "[[FRAG AUTH] MEM]".
+    iIntros "[AUTH MEM]".
     iPoseProof (MemIA.ctxr sp_mem [] with "MEM") as "MEMREF".
     iPoseProof (LListIA.ctxr sp_list sp_mem llist_in_sp with
       "AUTH") as "LISTREF".
-    iPoseProof (PrimeIA.ctxr sp_list llist_in_sp with
-      "FRAG") as "PRIMEREF".
+    iPoseProof (PrimeIA.ctxr sp_list llist_in_sp) as "PRIMEREF".
     iApply ctxr_refines.
     rewrite /mod_tgt /mod_src /sp_prime /smod_src.
     iApply ctxr_trans. iSplitL "MEMREF".
@@ -102,9 +103,10 @@ Section PrimeAux.
   Lemma top_tgt :
     (init_cond ∗ Cancel.init_res)%I ⊢ refines mod_tgt mod_top.
   Proof.
-    iIntros "R".
-    iPoseProof (cancel_src with "R") as "[INIT REF2]".
-    iPoseProof (src_tgt with "INIT") as "REF1".
+    rewrite /init_cond /LListA.init_cond.
+    iIntros "[[[FRAG AUTH] MEM] CANCEL]".
+    iPoseProof (cancel_src with "[$FRAG $CANCEL]") as "REF2".
+    iPoseProof (src_tgt with "[$AUTH $MEM]") as "REF1".
     iApply refines_trans. iFrame.
   Qed.
 
