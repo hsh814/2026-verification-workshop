@@ -1,0 +1,78 @@
+# ITrees in CRIS
+
+## 기본 생성자
+
+- `Ret val`
+  - value를 return
+- `tau;; itr`
+  - 이벤트를 발생시키지 않는 내부 행동
+- `trigger (e : crisE)`
+  - `e` event 발생
+
+## CRIS 이벤트
+
+- `triggerUB : itree crisE (A : Type)`
+  - undefined behavior를 발생시키는 interaction tree
+  - `itr := 'x : False <- triggerUB;; ktr x`
+    - 이 경우 `itr`의 행동은 임의의 trace를 모두 포함함
+    - `'x : T <- itr;; ktr x`에서 single quotation mark를 활용하면 `x`의 타입을 명시할 수 있음
+    - `x <- itr;; ktr x`에서는 `x`의 타입이 자동으로 추론됨
+- `trigger (SPut (k : key) (v : Any.t))`
+  - index `k`에 값 `v`를 저장
+  - `trigger (SPut ("mn", "k") v);;; itr`
+    - module `mn`에서 index `k`에 값 `v`를 저장하고 `itr`를 실행하는 computation
+  - `Any.t`란?
+    - CRIS 내부에서 정의된 universal type
+    - 함수 호출 시 내부적으로 모든 인자/반환값은 `Any.t`를 가지도록 정의됨
+      - 개별적인 타입들(`nat`, `val`, ...)을 사용했다면 일관된 인터페이스를 사용하기 힘듦
+    - `Check 3↑ : Any.t.`
+      - 자연수 3 옆에 `↑`를 붙이면 `Any.t`로 변환
+      - `Any.t` 타입 값에 `↓`를 붙이면 `option T`로 변환
+      - `3↑↓ = Some 3`과 같은 등식이 성립
+- `cput (k : key) (v : X)`
+  - `SPut`과 동일하되, 저장되는 값이 `Any.t`가 아님
+  - 내부적으로 `v`를 `Any.t` 타입으로 변환 후 저장
+  - `cput ("mn", "k") 0;;; itr`
+    - 자연수 0을 `k`에 저장
+- `trigger (SGet (k : key))`
+  - index `k`에 저장된 값 `v`를 continuation에 전달
+  - `v <- trigger (SGet ("mn", "k"));; ktr v`
+    - `k`에서 값 `v`를 읽은 뒤 `ktr v` 실행
+- `cgetU (k : key)`
+  - `SGet` 이벤트에 타입 변환이 포함된 버전
+  - `'x : nat <- cgetU ("mn", "k");; ktr x`
+    - `k`에서 값 `x`를 읽은 뒤 `ktr x` 실행
+    - 이때 `x`의 타입이 `Any.t`가 아님에 유의
+    - 만약 저장되었던 값의 타입이 자연수가 아니었다면 UB
+- `Call (fn : string) (arg : Any.t)`
+  - `fn`이라는 이름의 함수를 `arg`를 인자로 호출
+  - `x <- trigger (Call fn arg);; ktr x`
+    - `fn` 함수를 실행한 뒤 반환값을 받아 `ktr x` 실행
+- `ccallU (sig : fnsig_t A R)`
+  - 함수 시그니처가 `sig`인 함수 `fn`을 호출
+  - `ccallU (fnsig "fn" (fntyp unit val));;; itr`
+    - 이름이 `fn`, 인자 타입은 `unit`, 반환 타입은 `val`인 함수 호출
+    - 보통 `(fnsig ...)` 부분은 헤더 파일에서 정의되고, 함수를 호출하는 interaction tree 파일은 헤더 파일을 `Import`한 다음 시그니처를 재사용함
+  - `Call fn arg`의 매크로로 생각하면 편함
+- `IO (fn : string) (args : Any.t)`
+  - `fn`이라는 이름으로 외부에 I/O 이벤트 실행, 반환값 수신
+  - `'x : nat <- IO fn args;; ktr x`
+    - I/O 이벤트를 발생시키고 반환값 `x`를 받아 `ktr x` 실행
+- `Choose (X : Type)`
+  - `X`에 속하는 값 중 하나를 고르는 nondeterminism
+  - `x <- Choose X;; ktr x`
+    - `X`에서 고른 값 하나로 `ktr x` 실행
+    - 이 경우 프로그램의 행동은 `x` 각각에 대해 가능한 행동
+- `Take (X : Type)`
+  - `X`에 속하는 값 하나를 *받는* nondeterminism
+  - 예: `x <- Take X;; ktr x`
+    - `X`에서 골라진 값 하나로 `ktr x` 실행
+    - 이 경우 프로그램의 행동은 `x` 전체에 대해 공통된 행동
+- `trigger (Assume (P : iProp))`
+  - 프로그램 시점에서 `P`가 성립하지 않으면 UB
+  - `P`가 성립한다면 `tau`
+  - `trigger (Assume P);;; itr`
+- `trigger (Guarantee (P : iProp))`
+  - 프로그램 시점에서 `P`가 성립하지 않으면 no behavior
+  - `P`가 성립한다면 `tau`
+  - `trigger (Guarantee P);;; itr`
