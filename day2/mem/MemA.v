@@ -53,8 +53,8 @@ Section resources.
   (** TODO 1(a): define exclusive ownership of logical cell [l] containing
       [v].  Use [ghost_map_elem], [mem_map_name], and full ownership
       [DfracOwn 1]. *)
-  Definition pointsto (l : loc) (v : memval) : iProp Σ.
-  Admitted.
+  Definition pointsto (l : loc) (v : memval) : iProp Σ :=
+      ghost_map_elem mem_map_name l (DfracOwn 1) v.
 
   (** A persistent observation that the access count was at least [n].
       This definition is supplied because the interesting exercise is using
@@ -149,4 +149,19 @@ End MemA. End MemA.
 Lemma mem_alloc
     `{!crisG Γ Σ α β τ _S _I, !memGpreS} :
   ⊢ o=> ∃ (_ : memGS), MemA.init_cond.
-Admitted.
+Proof.
+  iMod (ghost_map_alloc_empty (K := loc) (V := memval)) as (γm) "MAP".
+  iMod (mono_nat_own_alloc 0) as (γc) "[COUNT SNAP]".
+  pose (Hmem := {|
+    memGS_pre := _;
+    mem_map_name := γm;
+    mem_count_name := γc
+  |}).
+  iExists Hmem.
+  rewrite /MemA.init_cond /MemA.frag_init /MemA.auth_init /count_snapshot.
+  iModIntro. cbn.
+  iCombine "MAP COUNT" as "AUTH".
+  iCombine "SNAP AUTH" as "INIT".
+  iExact "INIT".
+
+Qed.

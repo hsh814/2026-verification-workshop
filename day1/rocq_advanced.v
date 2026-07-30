@@ -31,10 +31,19 @@ Fixpoint optimize (e : expr) : expr :=
 Require Import Lia.
 Theorem optimize_correct : forall e, eval (optimize e) = eval e.
 Proof.
-  induction e as [n | e1 IH1 e2 IH2 | e1 IH1 e2 IH2]; simpl.
+  induction e as [n | e1 e2 IH1 IH2 | e1 e2 IH1 IH2]; simpl.
   - reflexivity.
-  - destruct e1; destruct e2; simpl; try rewrite IH1; try rewrite IH2; lia.
-  - destruct e1; destruct e2; simpl; try rewrite IH1; try rewrite IH2; lia.
+  - destruct e1, e2; simpl in *;
+      Show.
+      try rewrite IH1;
+      try rewrite IH2;
+      repeat match goal with z : Z |- _ => destruct z end;
+      simpl; lia.
+  - destruct e1, e2; simpl in *;
+      try rewrite IH1;
+      try rewrite IH2;
+      repeat match goal with z : Z |- _ => destruct z end;
+      simpl; lia.
 Qed.
 
 (** === 2. 상태를 가진 계산 (State-passing) === *)
