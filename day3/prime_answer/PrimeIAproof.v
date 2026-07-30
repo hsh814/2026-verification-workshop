@@ -73,18 +73,13 @@ Module PrimeIA. Section PrimeIA.
   Local Definition PrimeIMod := PrimeI.t ★ LListA.t sp_list.
 
   (** The modules have no private state at this layer.  [LListA] appears only
-      in the target module, where its calls are inlined.  The interesting
-      state is the resource-level list fragment.  During [get_prime], the
-      proof strengthens [values] to
+      in the target module, where its calls are inlined.  The list fragment
+      crosses [get_prime] through its function specification rather than the
+      module invariant.  During [get_prime], the proof strengthens [values] to
       [first_primes_desc found], keeps the returned [list_loc] fixed, and
       records the interval containing [candidate].  That stronger fact is
-      expressed as a pure invariant local to
-      [simF_get_prime], while keeping this module invariant small. *)
-  Definition Ist : ist_type Σ :=
-    (fun st_src st_tgt =>
-      ⌜st_src = st_tgt⌝ ∗
-      ∃ state,
-        LListA.list_user state)%I.
+      expressed as a pure invariant local to [simF_get_prime]. *)
+  Definition Ist : ist_type Σ := IstEq.
 
   Lemma simF_get_prime :
     ISim.sim_fun
@@ -92,12 +87,12 @@ Module PrimeIA. Section PrimeIA.
   Proof.
     cStartFunSim.
     rewrite /PrimeA.get_prime /PrimeI.get_prime.
-    destruct Any.downcast; cStepsS; des_ifs.
+    cStepsS.
+    iDestruct "ASM" as "(-> & -> & USER)". cSimpl.
     cStepsT. cStep.
     cStepsT. cInlineT. cStepsT.
-    iDestruct "IST" as "[% IST]". subst st_tgt.
-    iDestruct "IST" as (state) "USER".
-    cForceT state.
+    iDestruct "IST" as %->.
+    cForceT _q.
     cForceT (tt↑). cForceT. iFrame. cSimpl.
     iSplit; first done.
     cStepsT.
@@ -106,7 +101,8 @@ Module PrimeIA. Section PrimeIA.
     cSimpl. cStepsT.
     set (loop_state := (2, 0)).
     iAssert
-      (⌜candidate_window loop_state.2 loop_state.1 /\ loop_state.2 <= ret⌝ ∗
+      (⌜candidate_window loop_state.2 loop_state.1 /\
+         loop_state.2 <= ret⌝ ∗
        LListA.is_list list_loc (first_primes_desc loop_state.2))%I
       with "[USER]" as "LOOP".
     { subst loop_state. simpl. iSplit.
@@ -156,10 +152,12 @@ Module PrimeIA. Section PrimeIA.
       iDestruct "GRT" as "(-> & -> & USER)". cSimpl.
       destruct (Nat.eq_dec found ret) as [FOUND | NOT_FOUND].
       + subst found. cStepsT.
-        cStep. iSplit; first done.
-        rewrite /Ist. iSplit; first done.
-        iExists (Some
-          (list_loc, nth_prime ret :: first_primes_desc ret)). iFrame.
+        cStepsS. cForcesS.
+        iSplitL "USER".
+        { iSplit; first done.
+          iExists (Some
+            (list_loc, nth_prime ret :: first_primes_desc ret)). iFrame. }
+        cStep. done.
       + pose proof
           (no_divisor_found_window_step
             found (nth_prime found) WINDOW HAS)
@@ -253,14 +251,47 @@ Module PrimeIA. Section PrimeIA.
        [nth_prime_strict]. *)
   Qed.
 
+  Lemma simF_main :
+    ISim.sim_fun open PrimeAMod PrimeIMod Ist entry.
+  Proof.
+    cStartFunSim.
+    rewrite /PrimeA.main /PrimeI.main.
+    cStepsS.
+    iDestruct "ASM" as "(-> & -> & USER)". cSimpl.
+    cStepsT.
+    assert (GET_SPEC :
+      (SMod.sp_from PrimeA.smod).1 !! fid PrimeHdr.get_prime =
+        fsp_some PrimeA.get_prime_spec) by mod_tac.
+    rewrite GET_SPEC.
+    cForceS (None : llist_state). cForcesS.
+    iSplitL "USER".
+    { iSplit; first done. iSplit; first done. iFrame. }
+    cCall "IST" as (prime st_src st_tgt) "IST".
+    cStepsS.
+    iDestruct "ASM" as "[-> USER]".
+    iDestruct "USER" as (state) "USER".
+    cSimpl.
+    destruct (Any.downcast prime : option nat);
+      cStepsS; des_ifs.
+    cStepsT.
+    cStep.
+    cStepsS. cForcesS.
+    iSplitL "USER".
+    { iSplit; first done.
+      iSplit; first done.
+      iExists state. iFrame. }
+    cStep.
+    iFrame. done.
+  Qed.
+
   Lemma sim :
-    ISim.t open PrimeAMod PrimeIMod LListA.frag_init Ist.
+    ISim.t open PrimeAMod PrimeIMod emp%I Ist.
   Proof.
     cStartModSim.
     - vm_compute.
       apply submseteq_cons, submseteq_skip, submseteq_nil.
-    - iIntros "USER". rewrite /Ist. iSplit; first done.
-      iExists None. iFrame.
+    - iIntros "_". done.
+    - apply simF_main.
     - apply simF_get_prime.
   Qed.
 End PrimeIA.
@@ -271,7 +302,7 @@ Section contextual_refinement.
   Lemma ctxr
       (sp_list : specmap)
       (LIST_IN_SP : LListA.sp ⊆ sp_list) :
-    LListA.frag_init ⊢ ctx_refines
+    ⊢ ctx_refines
       (PrimeI.t ★ LListA.t sp_list)
       PrimeA.t.
   Proof.

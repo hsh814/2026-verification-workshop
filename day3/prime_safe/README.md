@@ -15,6 +15,11 @@ the supplied body-preserving safe-memory layer: it has the memory bodies and
 the `MemA` specifications, and replaces undefined memory behavior with
 `triggerNB`.
 
+`PrimeI` and `PrimeA` both contain a distinguished program entry. It calls
+`Prime.get_prime` and emits an `IO "print"` event with the returned natural
+number. `PrimeA.main_spec` is attached to that entry, so cancellation cannot
+succeed by silently treating a missing entry as `fsp_none`.
+
 The intended refinement chain is:
 
 ```text
@@ -37,9 +42,11 @@ is then passed to the cancellation theorem.
    simulation steps and matched calls rather than `MemTactics`.
 2. In `PrimeIAproof.v`, prove the prime client's safety specification. The
    key invariant is `length values = found`, which rules out the unsafe
-   `None` branch in `has_divisor`.
+   `None` branch in `has_divisor`. Then prove the entry by matching its
+   `get_prime` call with `cCall` and matching the print event.
 3. In `PrimeAll.v`, prove the three specification-map inclusions, compose
    `MemINB`, `LListIA`, and `PrimeIA`, and cancel the complete source module.
+   The cancellation proof must find `fsp_some PrimeA.main_spec` at `entry`.
 
 `PrimeMath.v` remains in the directory to preserve the layout of the
 original prime example, but this safety-only exercise should not require its

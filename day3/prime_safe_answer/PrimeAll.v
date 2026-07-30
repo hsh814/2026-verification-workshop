@@ -61,12 +61,14 @@ Section PrimeSafeAux.
     { iApply ctxr_refines. iApply Cancel.prepare; et; clarify. }
     iApply Cancel.cancel.
     { repeat apply SMod.cancellable_add; r; mod_tac ss. }
-    { assert (Ht : (SMod.sp_from smod_src).1 !! entry = fsp_none)
+    { assert (Ht : (SMod.sp_from smod_src).1 !! entry =
+          fsp_some PrimeA.main_spec)
         by mod_tac.
       rewrite Ht; clear Ht.
       ss; exists tt; split; refl.
     }
-    { unfoldPrePost. iIntros "% % $ //". }
+    { unfoldPrePost. iIntros "% % H".
+      iDestruct "H" as "(-> & _)". done. }
     iDestruct "CANCEL" as "(X & Y & Z & $ & $)".
     unfoldPrePost; done.
   Qed.

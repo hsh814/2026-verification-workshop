@@ -18,8 +18,15 @@ Module PrimeA. Section PrimeA.
         ((fun arg => ⌜arg = tt↑⌝),
          (fun ret => ∃ value : nat, ⌜ret = value↑⌝)))%I.
 
+  Definition main_spec : fspec :=
+    fspec_simple
+      (fun _ : unit =>
+        ((fun arg => ⌜arg = tt↑⌝),
+         (fun ret => ⌜ret = tt↑⌝)))%I.
+
   Definition sp : specmap :=
-    {[fid PrimeHdr.get_prime @ get_prime_spec]}.
+    {[entry @ main_spec;
+      fid PrimeHdr.get_prime @ get_prime_spec]}.
 
   (** These are exactly the bodies from [PrimeI]. *)
 
@@ -103,8 +110,17 @@ Module PrimeA. Section PrimeA.
             else Ret (inl (S candidate, S found)))
         (2, 0).
 
+  Definition main : Any.t -> itree crisE Any.t :=
+    fun _ =>
+      prime <- ccallU PrimeHdr.get_prime tt;;
+      '_ : unit <- trigger (@IO nat unit "print" prime);;
+      Ret tt↑.
+
   Definition fnsems : fnsemmap :=
-    {[fid PrimeHdr.get_prime #
+    {[entry #
+        (msk_scp scopes msk_true,
+          (fsp_some main_spec, main));
+      fid PrimeHdr.get_prime #
         (msk_scp scopes msk_true,
           (fsp_some get_prime_spec,
             cfunU PrimeHdr.get_prime get_prime))]}.
